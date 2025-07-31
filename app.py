@@ -8,12 +8,12 @@ WILO_GREEN = "#21B6A8"
 
 def wilo_header():
     st.markdown(
-        f"""
-        <div style='background-color:{WILO_GREEN};padding:1.2em 2em 1.2em 2em;display:flex;align-items:center;'>
-            <img src="wilo_logo.png.webp" style="height:50px;margin-right:24px;">
-            <span style='color:white; font-size:2.3em; font-weight:bold;vertical-align:middle;'>Výběr vhodného čerpadla</span>
-        </div>
-        """,
+        f"<div style='background-color:{WILO_GREEN};padding:1.2em 2em 1.2em 2em;'>",
+        unsafe_allow_html=True
+    )
+    st.image("wilo_logo.png.webp", width=60)
+    st.markdown(
+        "<span style='color:white; font-size:2.3em; font-weight:bold;vertical-align:middle;'>Výběr vhodného čerpadla</span></div>",
         unsafe_allow_html=True
     )
 
