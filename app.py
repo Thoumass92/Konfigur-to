@@ -12,7 +12,7 @@ st.markdown(
     f"""
     <div style='background-color:{WILO_GREEN};padding:1.5em 0em;'>
         <img src="wilo_logo.png" style="height:48px;vertical-align:middle;margin-right:1em;">
-        <span style='color:white; font-size:2em; font-weight:bold;'>Wilo – Výběr vhodného čerpadla</span>
+        <span style='color:white; font-size:2em; font-weight:bold;'>Výběr vhodného čerpadla</span>
     </div>
     """,
     unsafe_allow_html=True
