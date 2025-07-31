@@ -4,7 +4,6 @@ import math
 
 st.set_page_config(page_title="Výběr vhodného čerpadla Wilo", page_icon="💧")
 
-# --- TVOJE BARVA ---
 WILO_GREEN = "#21B6A8"
 
 # ZÁHLAVÍ: obrazek a text v jednom řádku pomocí columns
