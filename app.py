@@ -470,9 +470,7 @@ else:
     </script>
     """, height=0)
 
-# Původní výpočet a zobrazení
-if clicked:
-    st.success("Spočítal jsem to! Tady napiš svůj výsledek/výpočet...")
+#if st.button("Spočítat"):
     H, loss = calculate_head(dist_vert, riser, press_bar, dist_horz)
     Q = calculate_flow(persons, sprinklers, nozzles)
     req_H = math.ceil(H)
