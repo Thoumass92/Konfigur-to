@@ -4,16 +4,21 @@ import math
 
 st.set_page_config(page_title="Výběr vhodného čerpadla Wilo", page_icon="💧")
 
+WILO_GREEN = "#21B6A8"
+WILO_LOGO_URL = "https://i.imgur.com/TV3pWbI.png"  # <- sem vlož svoji adresu!
+
 def wilo_header():
     st.markdown(
         f"""
-        <div style='background-color:{WILO_GREEN};padding:1.2em 2em 1.2em 2em;display:flex;align-items:center;'>
-            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c5/WILO_Logo_2013.svg" style="height:50px;margin-right:24px;">
-            <span style='color:white; font-size:2.3em; font-weight:bold;vertical-align:middle;'>Výběr vhodného čerpadla</span>
+        <div style='background-color:{WILO_GREEN};padding:1.2em 2em;display:flex;align-items:center;'>
+            <img src="{WILO_LOGO_URL}" style="height:50px;margin-right:24px;">
+            <span style='color:white; font-size:2.3em; font-weight:bold;'>Výběr vhodného čerpadla</span>
         </div>
         """,
         unsafe_allow_html=True
     )
+
+wilo_header()
 
 # --- DATA BLOKY ---
 
