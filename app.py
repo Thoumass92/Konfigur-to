@@ -5,7 +5,7 @@ import math
 st.set_page_config(page_title="Výběr vhodného čerpadla Wilo", page_icon="💧")
 
 WILO_GREEN = "#21B6A8"
-WILO_LOGO_URL = "https://i.imgur.com/TV3pWbI.png"  # <- sem vlož svoji adresu!
+WILO_LOGO_URL = "https://upload.wikimedia.org/wikipedia/commons/c/c5/WILO_Logo_2013.svg"  # <- sem vlož svoji adresu!
 
 def wilo_header():
     st.markdown(
