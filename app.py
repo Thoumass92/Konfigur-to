@@ -4,6 +4,8 @@ import math
 
 st.set_page_config(page_title="Výběr vhodného čerpadla Wilo", page_icon="💧")
 
+st.image("wilo_logo.png.webp", width=200)
+
 # --- DATA BLOKY ---
 
 DATA_TWI5 = [
