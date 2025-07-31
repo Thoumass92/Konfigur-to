@@ -411,7 +411,55 @@ if typ_zdroje == "Vrt od 120 do 250 mm":
     st.subheader("Hloubka vrtu (pro výběr kabelu)")
     delka_kabelu = st.selectbox("Vyberte hloubku/délku kabelu (m):", [20, 30, 40, 50], index=1)
 
-if st.button("Spočítat"):
+# Definuj barvy
+BUTTON_COLOR = "#d4af37"  # tmavší žlutá
+BUTTON_TEXT_COLOR = "#fff"  # bílá
+
+# --- HTML tlačítko ---
+button_code = f"""
+    <style>
+    .custom-button {{
+        background-color: {BUTTON_COLOR};
+        color: {BUTTON_TEXT_COLOR};
+        font-size: 1.15em;
+        border: none;
+        border-radius: 8px;
+        padding: 0.55em 2.2em;
+        margin: 1em 0em 1em 0em;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background 0.3s;
+    }}
+    .custom-button:hover {{
+        background-color: #b5922a;
+    }}
+    </style>
+    <form action="" method="post">
+        <button class="custom-button" name="mybtn" type="submit">Spočítat</button>
+    </form>
+"""
+
+# --- Vlož tlačítko ---
+clicked = False
+st.markdown(button_code, unsafe_allow_html=True)
+
+# --- DETEKCE KLIKNUTÍ ---
+if st.session_state.get("mybtn"):
+    clicked = True
+else:
+    # Finta: Při každém reloadu si to nuluje, tak musíme to zachytit
+    import streamlit.components.v1 as components
+    components.html("""
+    <script>
+        if (window.parent) {
+            window.parent.postMessage({isStreamlitMessage: true, type: 'streamlit:rerun'}, '*')
+        }
+    </script>
+    """, height=0)
+
+# Původní výpočet a zobrazení
+if clicked:
+    st.success("Spočítal jsem to! Tady napiš svůj výsledek/výpočet...")
     H, loss = calculate_head(dist_vert, riser, press_bar, dist_horz)
     Q = calculate_flow(persons, sprinklers, nozzles)
     req_H = math.ceil(H)
