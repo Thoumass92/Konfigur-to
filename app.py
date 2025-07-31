@@ -8,7 +8,7 @@ def wilo_header():
     st.markdown(
         f"""
         <div style='background-color:{WILO_GREEN};padding:1.2em 2em 1.2em 2em;display:flex;align-items:center;'>
-            <img src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fbrandfetch.com%2Fwilo.com&psig=AOvVaw1eXE55dEng4fEIbnPMhJi-&ust=1754058847965000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCKjf8sWo544DFQAAAAAdAAAAABAE" style="height:50px;margin-right:24px;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c5/WILO_Logo_2013.svg" style="height:50px;margin-right:24px;">
             <span style='color:white; font-size:2.3em; font-weight:bold;vertical-align:middle;'>Výběr vhodného čerpadla</span>
         </div>
         """,
