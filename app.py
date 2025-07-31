@@ -411,16 +411,12 @@ if typ_zdroje == "Vrt od 120 do 250 mm":
     st.subheader("Hloubka vrtu (pro výběr kabelu)")
     delka_kabelu = st.selectbox("Vyberte hloubku/délku kabelu (m):", [20, 30, 40, 50], index=1)
 
-# Definuj barvy
-BUTTON_COLOR = "#d4af37"  # tmavší žlutá
-BUTTON_TEXT_COLOR = "#fff"  # bílá
-
-# --- HTML tlačítko ---
-button_code = f"""
+# --- Styluj všechny Streamlit buttony ---
+st.markdown("""
     <style>
-    .custom-button {{
-        background-color: {BUTTON_COLOR};
-        color: {BUTTON_TEXT_COLOR};
+    div.stButton > button {
+        background-color: #d4af37;
+        color: white;
         font-size: 1.15em;
         border: none;
         border-radius: 8px;
@@ -429,16 +425,33 @@ button_code = f"""
         cursor: pointer;
         font-weight: bold;
         transition: background 0.3s;
-    }}
-    .custom-button:hover {{
+    }
+    div.stButton > button:hover {
         background-color: #b5922a;
-    }}
+        color: #fff;
+    }
     </style>
-    <form action="" method="post">
-        <button class="custom-button" name="mybtn" type="submit">Spočítat</button>
-    </form>
-"""
+""", unsafe_allow_html=True)
 
+# --- Funkční tlačítko a výpočet ---
+if st.button("Spočítat"):
+    H, loss = calculate_head(dist_vert, riser, press_bar, dist_horz)
+    Q = calculate_flow(persons, sprinklers, nozzles)
+    req_H = math.ceil(H)
+    req_Q = math.ceil(Q)
+    st.write(f"Výtlak H: {H:.2f} m (zaokrouhleno na {req_H} m), ztráta: {loss:.2f} m")
+    st.write(f"Průtok Q: {Q:.2f} m³/h (zaokrouhleno na {req_Q} m³/h)")
+    result = find_best_pump(df_long, req_H, req_Q)
+    if not result.empty:
+        pump = result.iloc[0]
+        st.subheader("Doporučené čerpadlo:")
+        st.markdown(
+            f"**{pump['PumpModel']}** | Napětí: {int(pump['Voltage'])} V | "
+            f"H_max: {int(pump['H_max'])} m | Q_max: {pump['Q_max']} m³/h"
+        )
+        # ... (příslušenství a další části podle původního kódu) ...
+    else:
+        st.warning("Žádné čerpadlo nesplňuje potřebné parametry.")
 # --- Vlož tlačítko ---
 clicked = False
 st.markdown(button_code, unsafe_allow_html=True)
