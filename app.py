@@ -96,32 +96,56 @@ LANGS = {
     }
 }
 
-# --- Výběr jazyka nahoře vpravo ---
-col_lang, col_empty = st.columns([1, 8])
-with col_empty:
-    pass
-with col_lang:
-    lang = st.selectbox(
-        "", ["CZ", "EN"], format_func=lambda x: LANGS[x]["lang"], key="lang_selectbox"
-    )
+# --- Vzhled jazykového přepínače ---
+lang_select_css = """
+    <style>
+    .stSelectbox>div>div>div>div {
+        font-size: 1.17em !important;
+        font-weight: 600 !important;
+        min-width: 110px !important;
+    }
+    .stSelectbox, .stSelectbox>div { 
+        margin-bottom: -1.4em !important;
+    }
+    </style>
+"""
+st.markdown(lang_select_css, unsafe_allow_html=True)
+
+# --- Jazyk úplně nahoru, zarovnaný vpravo ---
+lang = st.selectbox(
+    "",
+    ["CZ", "EN"],
+    format_func=lambda x: LANGS[x]["lang"],
+    key="lang_selectbox"
+)
 TXT = LANGS[lang]
 
-# --- Logo + Název na střed ---
+# --- Panel s logem, titulek na střed, vyšší zelený panel ---
 st.markdown(
     f"""
-    <div style='display:flex;flex-direction:column;align-items:center;justify-content:center;margin-top:-2.2em;'>
-        <div style='background-color:{WILO_GREEN};padding:1.1em 2.5em 0.8em 2.5em;border-radius:0.8em;display:flex;align-items:center;gap:22px;'>
-            <img src="{WILO_LOGO_URL}" style="height:38px;margin-right:12px;">
-            <span style='color:white; font-size:2.2em; font-weight:700;'>{TXT['title']}</span>
+    <div style='width:100%; display:flex; flex-direction:column; align-items:center; margin-top:-1.5em;'>
+        <div style='
+            background-color:{WILO_GREEN};
+            padding:2.1em 2em 1.8em 2em;
+            border-radius:16px;
+            margin-bottom:1em;
+            min-width:450px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:32px;
+            box-shadow:0 4px 20px #21b6a82c;'
+        >
+            <img src="{WILO_LOGO_URL}" style="height:54px; margin-right:16px;">
+            <span style='color:white; font-size:2.5em; font-weight:900; letter-spacing:-1px;'>{TXT['title']}</span>
         </div>
-        <div style='margin-top:1.25em;font-size:1.13em;color:#444;text-align:center;max-width:580px;'>
+        <div style='margin-top:-0.5em;font-size:1.21em;color:#444;text-align:center;max-width:680px;'>
             {TXT['desc']}
         </div>
     </div>
     """,
     unsafe_allow_html=True
 )
-
 # --- DATA BLOKY ---
 
 DATA_TWI5 = [
