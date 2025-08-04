@@ -10,6 +10,11 @@ WILO_GREY = "#f5f5f5"
 # --- Logo ---
 WILO_LOGO_URL = "https://scontent-fra3-1.xx.fbcdn.net/v/t39.30808-6/312307533_996663857947185_6220530952015731225_n.png?_nc_cat=108&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=83_eOJu59pQQ7kNvwF1FuJO&_nc_oc=AdneoM6Ax72YEQxMPuPNAht6eEjBBfllTwCT3yezrDZ-QGObbuWxfAnWIddVn6dLfSs&_nc_zt=23&_nc_ht=scontent-fra3-1.xx&_nc_gid=Yvtk47THe4NhpdkBwjbyjA&oh=00_AfTEkPpnVzUkus59W8aK0U_bAIazC2CjjpJAEQDqjSBFcg&oe=68916816"
 
+LANGS = {
+    "CZ": {"lang": "Čeština", "title": "Výběr vhodného čerpadla", "desc": "Zadejte parametry zdroje a odběru. Doporučené čerpadlo a příslušenství budou vybrány automaticky."},
+    "EN": {"lang": "English", "title": "Pump Selection Tool", "desc": "Enter your source and demand parameters. The recommended pump and accessories will be selected automatically."}
+}
+
 # --- Překladové slovníky ---
 LANGS = {
     "CZ": {
@@ -101,26 +106,31 @@ LANGS = {
     }
 }
 
-# --- CSS pro větší selectbox ---
+# --- Větší selectbox pomocí CSS ---
 st.markdown("""
 <style>
-div[data-baseweb="select"] > div {
-    font-size: 1.16em !important;
+div[data-baseweb="select"] {
+    width: 180px !important;
+    font-size: 1.15em !important;
+}
+span[data-baseweb="select"] {
+    font-size: 1.13em !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# --- Jazykový přepínač úplně nahoře vpravo ---
-colA, colB = st.columns([7,1])
+# --- Přepínač jazyka úplně nahoře, pěkně vpravo ---
+colA, colB, colC = st.columns([7, 2, 7])
 with colB:
     lang = st.selectbox(
-        "", ["CZ", "EN"],
+        " ",
+        options=["CZ", "EN"],
         format_func=lambda x: LANGS[x]["lang"],
         key="lang_selectbox"
     )
 TXT = LANGS[lang]
 
-# --- Panel s logem a titulkem ---
+# --- Titulek a popis ---
 st.markdown(
     f"""
     <div style='width:100%; display:flex; flex-direction:column; align-items:center; margin-top:-1.5em;'>
