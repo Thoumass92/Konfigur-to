@@ -460,24 +460,27 @@ if st.button("Spočítat"):
     st.write(f"Průtok Q: {Q:.2f} m³/h (zaokrouhleno na {req_Q} m³/h)")
     
     # ---- HWJ domácí vodárny pro kopanou studnu do 8 m ----
-    if typ_zdroje == "Kopaná studna (>500 mm)" and dist_vert <= 8:
-        hwj = najdi_hwj(req_Q)
-        st.subheader("Doporučená domácí vodárna (pro nízký výtlak):")
+if typ_zdroje == "Kopaná studna (>500 mm)" and dist_vert <= 8:
+    hwj = najdi_hwj(req_Q)
+    st.subheader("Doporučená domácí vodárna (pro nízký výtlak):")
+    st.markdown(
+        f"**{hwj['model']}** | H_max: {hwj['H_max']} m | Q_max: {hwj['Q_max']} m³/h"
+    )
+    st.info("Pro sání do 8 metrů je vhodné použít domácí vodárnu s integrovanou expanzní nádobou.")
+    
+    st.markdown("#### Kde koupit domácí vodárnu HWJ:")
+    shops = [
+        {"name": "Bola.cz", "url": "https://www.bola.cz/vyhledat-produkt/HWJ"},
+        {"name": "Pumpa.eu", "url": "https://www.pumpa.eu/cs/wilo-jet-hwj-automaticke-samonasavaci-domaci-vodarny/"},
+        {"name": "Kamody.cz", "url": "https://www.kamody.cz/index.php?route=product/search&filter_name=HWJ"}
+    ]
+    for shop in shops:
         st.markdown(
-            f"**{hwj['model']}** | H_max: {hwj['H_max']} m | Q_max: {hwj['Q_max']} m³/h"
-        )
-        st.info("Pro sání do 8 metrů je vhodné použít domácí vodárnu s integrovanou expanzní nádobou.")
-        
-        obchod = st.selectbox(
-            "Vyberte obchod pro nákup domácí vodárny HWJ:",
-            ("Vybrat obchod…", "Bola.cz", "Pumpa.eu", "Kamody.cz")
-        )
-        if obchod == "Bola.cz":
-            st.markdown("[Přejít do obchodu Bola.cz](https://www.bola.cz/vyhledat-produkt/HWJ)", unsafe_allow_html=True)
-        elif obchod == "Pumpa.eu":
-            st.markdown("[Přejít do obchodu Pumpa.eu](https://www.pumpa.eu/cs/wilo-jet-hwj-automaticke-samonasavaci-domaci-vodarny/)", unsafe_allow_html=True)
-        elif obchod == "Kamody.cz":
-            st.markdown("[Přejít do obchodu Kamody.cz](https://www.kamody.cz/index.php?route=product/search&filter_name=HWJ)", unsafe_allow_html=True)
+            f"<div style='display:flex;align-items:center;margin-bottom:0.5em;'>"
+            f"<span style='font-size:1.08em;font-weight:500;width:120px'>{shop['name']}</span>"
+            f"<a href='{shop['url']}' target='_blank'>"
+            f"<button style='margin-left:18px;padding:0.45em 1.2em;background:#d4af37;color:white;font-weight:bold;border:none;border-radius:6px;cursor:pointer;font-size:1.08em;'>Koupit</button>"
+            f"</a></div>", unsafe_allow_html=True)
     else:
         result = find_best_pump(df_long, req_H, req_Q)
         if not result.empty:
