@@ -428,8 +428,8 @@ if st.button("Spočítat"):
     st.write(f"Výtlak H: {H:.2f} m (zaokrouhleno na {req_H} m), ztráta: {loss:.2f} m")
     st.write(f"Průtok Q: {Q:.2f} m³/h (zaokrouhleno na {req_Q} m³/h)")
 
-    # HWJ vodárna do 8 m
-    if typ_zdroje == "Kopaná studna (>500 mm)" and dist_vert <= 8:
+# HWJ vodárna do 8 m
+if typ_zdroje == "Kopaná studna (>500 mm)" and dist_vert <= 8:
     hwj = najdi_hwj(req_Q)
     st.subheader("Doporučená domácí vodárna (pro nízký výtlak):")
     st.markdown(f"**{hwj['model']}** | H_max: {hwj['H_max']} m | Q_max: {hwj['Q_max']} m³/h")
