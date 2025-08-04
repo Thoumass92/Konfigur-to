@@ -124,6 +124,13 @@ DATA_HWJ = [
     {"model": "HWJ 401 EM 60 l - M", "Q_max": 4.8, "H_max": 50},
 ]
 
+# --- Seznam obchodů pro HWJ vodárny ---
+HWJ_SHOPS = [
+    {"name": "Bola.cz", "url": "https://www.bola.cz/vyhledat-produkt/HWJ"},
+    {"name": "Pumpa.eu", "url": "https://www.pumpa.eu/cs/wilo-jet-hwj-automaticke-samonasavaci-domaci-vodarny/"},
+    {"name": "Kamody.cz", "url": "https://www.kamody.cz/index.php?route=product/search&filter_name=HWJ"},
+]
+
 # --- Kompletní příslušenství podle tabulky
 # Pro přehlednosti uvádím jen základní část, ale můžeš ji libovolně rozšířit. Stačí přidat další položky podle potřeby.
 TWU4_ACCESSORIES = {
