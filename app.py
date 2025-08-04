@@ -506,6 +506,7 @@ with col1:
  riser = st.number_input(
         TXT["riser"], 0.0, 500.0, 2.0, step=1.0
     )
+    
 with col2:
     persons = st.number_input(
         TXT["persons"], 1, 20, 4
