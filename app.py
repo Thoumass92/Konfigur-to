@@ -82,6 +82,25 @@ LANGS = {
     }
 }
 
+# --- Výběr jazyka ---
+lang = st.radio(
+    f"🌐 {LANGS['CZ']['switch']}/{LANGS['EN']['switch']}", ["CZ", "EN"],
+    format_func=lambda x: LANGS[x]["lang"]
+)
+TXT = LANGS[lang]
+
+# --- Záhlaví ---
+st.markdown(
+    f"""
+    <div style='background-color:{WILO_GREEN};padding:1.5em 2em;display:flex;align-items:center;gap:24px;border-radius:0 0 18px 18px;margin-bottom:2em;'>
+        <img src="{WILO_LOGO_URL}" style="height:48px;">
+        <span style='color:white; font-size:2.3em; font-weight:bold;'>{TXT["title"]}</span>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+st.title(TXT["subtitle"])
+st.markdown(TXT["desc"])
 # --- DATA BLOKY ---
 
 DATA_TWI5 = [
@@ -406,7 +425,7 @@ def najdi_hwj(Q):
     for hwj in DATA_HWJ:
         if Q <= hwj["Q_max"]:
             return hwj
-    return DATA_HWJ[-1]
+    return DATA_HWJ[-1] if DATA_HWJ else None
 
 def calculate_head(dist_vert, riser, press_bar, dist_horz, friction_coeff=0.05):
     head_press = press_bar * 10
@@ -428,101 +447,82 @@ def find_best_pump(df, req_H, req_Q):
     df["abs_diff"] = (df["H_max"] - req_H).abs() + (df["Q_max"] - req_Q).abs()
     return df.nsmallest(1, "abs_diff")
 
-# --- Parametry ---
-st.title("Konfigurátor pro výběr čerpadla Wilo 💧")
-st.markdown("Zadejte parametry zdroje a odběru. Doporučené čerpadlo a příslušenství budou vybrány automaticky.")
-
+# --- UI parametry ---
 typ_zdroje = st.radio(
-    "Typ zdroje vody:",
+    TXT["source_type"],
     (
-        "Kopaná studna (>500 mm)",
-        "Vrt od 120 do 250 mm",
-        "Vrt do 120 mm"
+        TXT["studna"],
+        TXT["vrt120"],
+        TXT["vrt100"]
     )
 )
-
-st.header("Parametry odběru vody")
+st.header(TXT["params_header"])
 col1, col2 = st.columns([1, 1])
 with col1:
     dist_vert = st.number_input(
-        "Svislá vzdálenost (od hladiny ke středu čerpadla) [m]",
-        0.0, 1000.0, 4.0, step=1.0,
-        help="Výška hladiny vody ode dna do čerpadla – pro povrchová čerpadla max. 8 m"
+        TXT["depth"],
+        0.0, 1000.0, 4.0, step=1.0
     )
     dist_horz = st.number_input(
-        "Vzdálenost od čerpadla k prvnímu odběrnému místu [m]",
-        0.0, 1000.0, 3.0, step=1.0,
-        help="Délka potrubí od čerpadla ke kohoutku"
+        TXT["pipe"],
+        0.0, 1000.0, 3.0, step=1.0
     )
     press_bar = st.number_input(
-        "Požadovaný tlak na výstupu [bar]",
-        0.0, 20.0, 2.0, step=0.5,
-        help="Tlak potřebný v nejvyšším místě rozvodu"
+        TXT["press"],
+        0.0, 20.0, 2.0, step=0.5
     )
-    riser = st.number_input(
-        "Výškový rozdíl mezi čerpadlem a nejvyšším odběrným místem [m]",
-        0.0, 500.0, 2.0, step=1.0,
-        help="Např. pokud je odběr v patře"
-        )
 with col2:
+    riser = st.number_input(
+        TXT["riser"], 0.0, 500.0, 2.0, step=1.0
+    )
     persons = st.number_input(
-        "Počet osob v domácnosti", 1, 20, 4,
-        help="Vliv na typický průtok"
+        TXT["persons"], 1, 20, 4
     )
     sprinklers = st.number_input(
-        "Počet zavlažovacích zařízení", 0, 10, 1,
-        help="Počet závlahových postřikovačů"
+        TXT["sprinklers"], 0, 10, 1
     )
     nozzles = st.number_input(
-        "Počet výstupů pro hadici", 0, 20, 1,
-        help="Počet míst, kde bude současně voda"
+        TXT["nozzles"], 0, 20, 1
     )
 
-# --- Hloubka vrtu ---
 hloubka_vrtu = None
-if typ_zdroje == "Vrt od 120 do 250 mm":
+if typ_zdroje == TXT["vrt120"]:
     hloubka_vrtu = st.number_input(
-        "Hloubka vrtu (pro volbu kabelu a lanka) [m]",
-        min_value=10, max_value=200, value=30, step=1,
-        help="Celková hloubka vrtu od povrchu – kabel a lanko se doporučí podle této hodnoty."
+        TXT["vrt_depth"], min_value=10, max_value=200, value=30, step=1
     )
 
-# --- Výběr dat ---
-if typ_zdroje == "Kopaná studna (>500 mm)":
+if typ_zdroje == TXT["studna"]:
     df_long = pd.DataFrame(DATA_TWI5, columns=["H_max", "Q_max", "PumpModel"])
-elif typ_zdroje == "Vrt od 120 do 250 mm":
+elif typ_zdroje == TXT["vrt120"]:
     df_long = pd.DataFrame(DATA_TWU4, columns=["H_max", "Q_max", "PumpModel"])
 else:
     df_long = pd.DataFrame(DATA_TWU3, columns=["H_max", "Q_max", "PumpModel"])
 df_long["Voltage"] = 230
 
-# --- Výpočet ---
-if st.button("Spočítat"):
+if st.button(TXT["spocitat"]):
     H, loss = calculate_head(dist_vert, riser, press_bar, dist_horz)
     Q = calculate_flow(persons, sprinklers, nozzles)
     req_H = math.ceil(H)
     req_Q = math.ceil(Q)
     st.markdown(
         f"<div style='margin:1.3em 0 0.5em 0;color:#222;font-size:1.09em;'>"
-        f"<b>Výtlak H:</b> {H:.2f} m (zaokrouhleno na {req_H} m), <b>ztráta:</b> {loss:.2f} m<br>"
-        f"<b>Průtok Q:</b> {Q:.2f} m³/h (zaokrouhleno na {req_Q} m³/h)</div>",
+        f"<b>{TXT['head']}:</b> {H:.2f} m (rounded {req_H} m), <b>{TXT['loss']}:</b> {loss:.2f} m<br>"
+        f"<b>{TXT['flow']}:</b> {Q:.2f} m³/h (rounded {req_Q} m³/h)</div>",
         unsafe_allow_html=True
     )
 
     # --- HWJ doporučení ---
-    if typ_zdroje == "Kopaná studna (>500 mm)" and dist_vert <= 8:
+    if typ_zdroje == TXT["studna"] and dist_vert <= 8 and DATA_HWJ:
         hwj = najdi_hwj(req_Q)
         st.markdown(
             f"<div style='background:{WILO_GREEN_LIGHT};border-left:8px solid {WILO_GREEN};padding:1.4em 2em 1.1em 2em;margin:2em 0 1.2em 0;border-radius:11px;'>"
-            f"<span style='font-size:1.35em;font-weight:700;'>Doporučená domácí vodárna (pro nízký výtlak):</span><br><br>"
+            f"<span style='font-size:1.35em;font-weight:700;'>{TXT['hwj_title']}</span><br><br>"
             f"<b style='font-size:1.18em;color:#222;'>{hwj['model']}</b> | <span style='color:#777;'>H_max:</span> {hwj['H_max']} m | <span style='color:#777;'>Q_max:</span> {hwj['Q_max']:.1f} m³/h"
-            "<div style='margin-top:1em;background:#eaf5ff;border-radius:7px;padding:0.7em 1.2em;font-size:1em;'>"
-            "Pro sání do 8 metrů je vhodné použít domácí vodárnu s integrovanou expanzní nádobou."
-            "</div>"
+            f"<div style='margin-top:1em;background:#eaf5ff;border-radius:7px;padding:0.7em 1.2em;font-size:1em;'>{TXT['hwj_suitable']}</div>"
             "</div>",
             unsafe_allow_html=True
         )
-        st.markdown("<h4 style='margin-top:0.7em'>Kde koupit domácí vodárnu HWJ:</h4>", unsafe_allow_html=True)
+        st.markdown(f"<h4 style='margin-top:0.7em'>{TXT['where_hwk']}</h4>", unsafe_allow_html=True)
         shops = [
             {"name": "Bola.cz", "url": "https://www.bola.cz/vyhledat-produkt/HWJ"},
             {"name": "Pumpa.eu", "url": "https://www.pumpa.eu/cs/wilo-jet-hwj-automaticke-samonasavaci-domaci-vodarny/"},
@@ -533,7 +533,7 @@ if st.button("Spočítat"):
                 f"<div style='display:flex;align-items:center;margin-bottom:0.5em;'>"
                 f"<span style='font-size:1.11em;font-weight:500;width:120px'>{shop['name']}</span>"
                 f"<a href='{shop['url']}' target='_blank'>"
-                f"<button style='margin-left:18px;padding:0.45em 1.6em;background:{WILO_GREEN};color:white;font-weight:bold;border:none;border-radius:6px;cursor:pointer;font-size:1.09em;'>Koupit</button>"
+                f"<button style='margin-left:18px;padding:0.45em 1.6em;background:{WILO_GREEN};color:white;font-weight:bold;border:none;border-radius:6px;cursor:pointer;font-size:1.09em;'>{TXT['buy']}</button>"
                 f"</a></div>", unsafe_allow_html=True)
     else:
         result = find_best_pump(df_long, req_H, req_Q)
@@ -541,18 +541,18 @@ if st.button("Spočítat"):
             pump = result.iloc[0]
             st.markdown(
                 f"<div style='background:#F8FCFB;border-left:8px solid {WILO_GREEN};padding:1.2em 2em 1.2em 2em;margin:2em 0 1.3em 0;border-radius:11px;'>"
-                f"<span style='font-size:1.3em;font-weight:700;'>Doporučené čerpadlo:</span><br><br>"
-                f"<b style='font-size:1.12em;color:#222;'>{pump['PumpModel']}</b> | <span style='color:#777;'>Napětí:</span> {int(pump['Voltage'])} V | <span style='color:#777;'>H_max:</span> {int(pump['H_max'])} m | <span style='color:#777;'>Q_max:</span> {pump['Q_max']:.1f} m³/h"
+                f"<span style='font-size:1.3em;font-weight:700;'>{TXT['pump_title']}</span><br><br>"
+                f"<b style='font-size:1.12em;color:#222;'>{pump['PumpModel']}</b> | <span style='color:#777;'>{TXT['voltage']}:</span> {int(pump['Voltage'])} V | <span style='color:#777;'>{TXT['head_max']}:</span> {int(pump['H_max'])} m | <span style='color:#777;'>{TXT['flow_max']}:</span> {pump['Q_max']:.1f} m³/h"
                 "</div>",
                 unsafe_allow_html=True
             )
             st.markdown(
                 f"""
                 <a href="https://wilo.com/cz/cs/dum-a-zahrada/%C5%98e%C5%A1en%C3%AD/" target="_blank">
-                    <button style='font-size:1.14em; background:{WILO_GREEN}; color:white; padding:0.55em 2.2em; border:none; border-radius:8px; cursor:pointer; margin-top:0.7em;'>🌐 Kde koupit?</button>
+                    <button style='font-size:1.14em; background:{WILO_GREEN}; color:white; padding:0.55em 2.2em; border:none; border-radius:8px; cursor:pointer; margin-top:0.7em;'>{TXT['shop_btn']}</button>
                 </a>
                 """,
                 unsafe_allow_html=True
             )
         else:
-            st.warning("Žádné čerpadlo nesplňuje potřebné parametry.")
+            st.warning(TXT["no_pump"])
