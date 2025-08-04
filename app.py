@@ -339,8 +339,7 @@ TWU4_ACCESSORIES = {
         "napojení": "2867014"
     },
 }
-# Funkce pro doporučení kabelu podle hloubky/délky
-
+# --- Funkce ---
 def doporuc_kabel(accessory, hloubka):
     if accessory and "kabel" in accessory:
         delky = sorted(accessory["kabel"].keys())
@@ -348,13 +347,11 @@ def doporuc_kabel(accessory, hloubka):
             if hloubka <= d:
                 return d, accessory["kabel"][d]
         return delky[-1], accessory["kabel"][delky[-1]]
-    return (None, (None, None))
+    return None, (None, None)
 
 def get_twu4_accessories(pump_model, accessories_dict):
-    pump_model_norm = pump_model.replace(" ", "").replace("-", "").replace(".", "").upper()
     for key in accessories_dict:
-        key_norm = key.replace(" ", "").replace("-", "").replace(".", "").upper()
-        if pump_model_norm in key_norm or key_norm in pump_model_norm:
+        if pump_model.split()[0] in key:
             return accessories_dict[key]
     return None
 
@@ -384,7 +381,7 @@ def find_best_pump(df, req_H, req_Q):
     df["abs_diff"] = (df["H_max"] - req_H).abs() + (df["Q_max"] - req_Q).abs()
     return df.nsmallest(1, "abs_diff")
 
-# --- UI a logika ---
+# --- UI ---
 st.title("Konfigurátor pro výběr čerpadla Wilo 💧")
 st.markdown("Zadejte parametry zdroje a odběru. Doporučené čerpadlo a příslušenství budou vybrány automaticky.")
 
@@ -397,51 +394,22 @@ typ_zdroje = st.radio(
     )
 )
 
-st.header("Parametry odběru vody")
-col1, col2 = st.columns(2)
+col1, col2 = st.columns([2,2])
 with col1:
-    dist_vert = st.number_input(
-        "Svislá vzdálenost (od hladiny ke středu čerpadla) [m]",
-        0.0, 1000.0, 10.0, step=1.0,
-        help="Výška hladiny vody ode dna do čerpadla – pro povrchová čerpadla max. 8 m"
-    )
-    riser = st.number_input(
-        "Výškový rozdíl mezi čerpadlem a nejvyšším odběrným místem [m]",
-        0.0, 500.0, 5.0, step=1.0,
-        help="Např. pokud je odběr v patře"
-    )
-    dist_horz = st.number_input(
-        "Vzdálenost od čerpadla k prvnímu odběrnému místu [m]",
-        0.0, 1000.0, 20.0, step=1.0,
-        help="Délka vodovodního potrubí od čerpadla ke kohoutku"
-    )
-    press_bar = st.number_input(
-        "Požadovaný tlak na výstupu [bar]",
-        0.0, 20.0, 2.0, step=0.1,
-        help="Tlak, který potřebujete v nejvyšším místě rozvodu"
-    )
+    dist_vert = st.number_input("Vzdálenost od hladiny k čerpadlu [m] (max 8 m pro povrchové čerpadlo)", 0.0, 1000.0, 4.0, step=1.0)
+    dist_horz = st.number_input("Vzdálenost od čerpadla k prvnímu odběrnému místu [m]", 0.0, 1000.0, 3.0, step=1.0)
+    press_bar = st.number_input("Požadovaný tlak na výstupu [bar]", 0.0, 20.0, 2.0)
 with col2:
-    persons = st.number_input(
-        "Počet osob v domácnosti", 1, 20, 4, step=1,
-        help="Vliv na typický průtok"
-    )
-    sprinklers = st.number_input(
-        "Počet zavlažovacích zařízení", 0, 10, 1, step=1,
-        help="Počet závlahových postřikovačů"
-    )
-    nozzles = st.number_input(
-        "Počet výstupů pro hadici", 0, 20, 1, step=1,
-        help="Počet míst, kde bude současně voda"
-    )
-# --- Hloubka vrtu jako číslo ---
-hloubka_vrtu = None
-if typ_zdroje == "Vrt od 120 do 250 mm":
-    hloubka_vrtu = st.number_input(
-        "Hloubka vrtu (pro volbu kabelu a lanka) [m]",
-        min_value=10, max_value=200, value=30,
-        help="Celková hloubka vrtu od povrchu – kabel a lanko se doporučí podle této hodnoty."
-    )
+    riser = st.number_input("Výškový rozdíl mezi čerpadlem a nejvyšším odběrným místem [m]", 0.0, 100.0, 2.0, step=1.0)
+    persons = st.number_input("Počet osob v domácnosti", 1, 20, 4)
+    sprinklers = st.number_input("Počet zavlažovacích zařízení", 0, 10, 1)
+    nozzles = st.number_input("Počet výstupů pro hadici", 0, 20, 1)
 
+vrt_hloubka = None
+if typ_zdroje == "Vrt od 120 do 250 mm":
+    vrt_hloubka = st.number_input("Zadejte hloubku vrtu (pro výběr kabelu) [m]", 10, 50, 40, step=1)
+
+# --- Volba dat pro správný zdroj ---
 if typ_zdroje == "Kopaná studna (>500 mm)":
     df_long = pd.DataFrame(DATA_TWI5, columns=["H_max", "Q_max", "PumpModel"])
 elif typ_zdroje == "Vrt od 120 do 250 mm":
@@ -450,6 +418,8 @@ else:
     df_long = pd.DataFrame(DATA_TWU3, columns=["H_max", "Q_max", "PumpModel"])
 df_long["Voltage"] = 230
 
+# --- Výpočet a výběr čerpadla ---
+obchod = None
 if st.button("Spočítat"):
     H, loss = calculate_head(dist_vert, riser, press_bar, dist_horz)
     Q = calculate_flow(persons, sprinklers, nozzles)
@@ -457,68 +427,63 @@ if st.button("Spočítat"):
     req_Q = math.ceil(Q)
     st.write(f"Výtlak H: {H:.2f} m (zaokrouhleno na {req_H} m), ztráta: {loss:.2f} m")
     st.write(f"Průtok Q: {Q:.2f} m³/h (zaokrouhleno na {req_Q} m³/h)")
-    
- # --- ULOŽÍ, že uživatel kliknul ---
-if "show_hwj_shops" not in st.session_state:
-    st.session_state["show_hwj_shops"] = False
 
-# --- V sekci, kde doporučuješ HWJ vodárnu: ---
-if typ_zdroje == "Kopaná studna (>500 mm)" and req_H <= 8:
-    hwj = najdi_hwj(req_Q)
-    st.subheader("Doporučená domácí vodárna (pro nízký výtlak):")
-    st.markdown(
-        f"**{hwj['model']}** | H_max: {hwj['H_max']} m | Q_max: {hwj['Q_max']} m³/h"
-    )
-    st.info("Pro nízký výtlak do 8 metrů je vhodné použít domácí vodárnu s integrovanou expanzní nádobou.")
-    
-    # --- První krok: tlačítko kde koupit ---
-    if st.button("🌐 Kde koupit HWJ?"):
-        st.session_state["show_hwj_shops"] = True
-
-    # --- Druhý krok: výběr eshopu ---
-    if st.session_state["show_hwj_shops"]:
-        st.markdown("#### Vyberte obchod:")
-        shops = [
-            ("Bola.cz", "https://www.bola.cz/vyhledat-produkt/HWJ"),
-            ("Pumpa.eu", "https://www.pumpa.eu/cs/wilo-jet-hwj-automaticke-samonasavaci-domaci-vodarny/"),
-            ("Kamody.cz", "https://www.kamody.cz/index.php?route=product/search&filter_name=HWJ")
-        ]
-        for shop_name, shop_url in shops:
-            st.markdown(
-                f"""
-                <a href="{shop_url}" target="_blank">
-                    <button style='font-size:1.1em; background:#21B6A8; color:white; padding:0.6em 2em; border:none; border-radius:8px; cursor:pointer; margin:0.5em 1em 0.5em 0;'>{shop_name}</button>
-                </a>
-                """,
-                unsafe_allow_html=True
-            )
+    # HWJ vodárna do 8 m
+    if typ_zdroje == "Kopaná studna (>500 mm)" and dist_vert <= 8:
+        hwj = najdi_hwj(req_Q)
+        st.subheader("Doporučená domácí vodárna (pro nízký výtlak):")
+        st.markdown(f"**{hwj['model']}** | H_max: {hwj['H_max']} m | Q_max: {hwj['Q_max']} m³/h")
+        st.info("Pro nízký výtlak do 8 metrů je vhodné použít domácí vodárnu s integrovanou expanzní nádobou.")
         
-            # Příslušenství pro TWU4
-            if typ_zdroje == "Vrt od 120 do 250 mm":
-                acc = get_twu4_accessories(pump['PumpModel'], TWU4_ACCESSORIES)
-                if acc:
-                    st.subheader("Doporučené příslušenství:")
-                    st.write(f"- Řízení: **{acc['řízení']}**")
-                    st.write(f"- Expanze: **{acc['expanze']}**" if acc['expanze'] else "- Expanze: (není potřeba)")
-                    # --- Automatický výběr kabelu podle hloubky vrtu ---
-                    if hloubka_vrtu:
-                        dop_delka, (kabel_typ, kabel_obj) = doporuc_kabel(acc, hloubka_vrtu)
-                        if kabel_typ:
-                            st.write(f"- Kabel a lanko: **{kabel_typ}** (obj. {kabel_obj}) – doporučeno pro vrt {dop_delka} m (zadáno {hloubka_vrtu} m)")
-                        else:
-                            st.warning("Pro zadanou hloubku není kabel v seznamu.")
-                    st.write(f"- Napojení: **{acc['napojení']}**")
-                else:
-                    st.info("Pro tento model není příslušenství v seznamu.")
-
-            # *** Kde koupit ***
-            st.markdown(
-                """
-                <a href="https://wilo.com/cz/cs/dum-a-zahrada/%C5%98e%C5%A1en%C3%AD/" target="_blank">
-                    <button style='font-size:1.2em; background:#21B6A8; color:white; padding:0.5em 2em; border:none; border-radius:6px; cursor:pointer; margin-top:1em;'>🌐 Kde koupit?</button>
-                </a>
-                """,
-                unsafe_allow_html=True
+        # Tlačítko Kde koupit → výběr obchodů (uživatelsky přívětivé)
+        if st.button("Kde koupit tuto domácí vodárnu?"):
+            obchod = st.selectbox(
+                "Vyberte obchod pro nákup HWJ vodárny:",
+                ("Bola.cz", "Pumpa.eu", "Kamody.cz")
             )
-        else:
-            st.warning("Žádné čerpadlo nesplňuje potřebné parametry.")
+            if obchod == "Bola.cz":
+                st.markdown("[Přejít do obchodu Bola.cz](https://www.bola.cz/vyhledat-produkt/HWJ)", unsafe_allow_html=True)
+            elif obchod == "Pumpa.eu":
+                st.markdown("[Přejít do obchodu Pumpa.eu](https://www.pumpa.eu/cs/wilo-jet-hwj-automaticke-samonasavaci-domaci-vodarny/)", unsafe_allow_html=True)
+            elif obchod == "Kamody.cz":
+                st.markdown("[Přejít do obchodu Kamody.cz](https://www.kamody.cz/index.php?route=product/search&filter_name=HWJ)", unsafe_allow_html=True)
+        st.stop()
+
+    # Výběr ponorného čerpadla (TWI/TWU)
+    result = find_best_pump(df_long, req_H, req_Q)
+    if not result.empty:
+        pump = result.iloc[0]
+        st.subheader("Doporučené čerpadlo:")
+        st.markdown(
+            f"**{pump['PumpModel']}** | Napětí: {int(pump['Voltage'])} V | "
+            f"H_max: {int(pump['H_max'])} m | Q_max: {pump['Q_max']} m³/h"
+        )
+
+        # --- Příslušenství pro TWU4 (automatický výběr kabelu) ---
+        if typ_zdroje == "Vrt od 120 do 250 mm":
+            acc = get_twu4_accessories(pump['PumpModel'], TWU4_ACCESSORIES)
+            if acc:
+                st.subheader("Doporučené příslušenství:")
+                st.write(f"- Řízení: **{acc['řízení']}**")
+                st.write(f"- Expanze: **{acc['expanze']}**" if acc['expanze'] else "- Expanze: (není potřeba)")
+                # Automatický kabel
+                dop_l, (kabel_typ, kabel_obj) = doporuc_kabel(acc, vrt_hloubka)
+                if kabel_typ:
+                    st.write(f"- Kabel: **{kabel_typ}** (obj. {kabel_obj}) – doporučeno pro vrt {dop_l} m")
+                else:
+                    st.warning("Pro zadanou hloubku není kabel v seznamu.")
+                st.write(f"- Napojení: **{acc['napojení']}**")
+            else:
+                st.info("Pro tento model není příslušenství v seznamu.")
+
+        # Kde koupit (obecně pro ponorná čerpadla)
+        st.markdown(
+            """
+            <a href="https://wilo.com/cz/cs/dum-a-zahrada/%C5%98e%C5%A1en%C3%AD/" target="_blank">
+                <button style='font-size:1.2em; background:#21B6A8; color:white; padding:0.5em 2em; border:none; border-radius:6px; cursor:pointer; margin-top:1em;'>🌐 Kde koupit?</button>
+            </a>
+            """,
+            unsafe_allow_html=True
+        )
+    else:
+        st.warning("Žádné čerpadlo nesplňuje potřebné parametry.")
