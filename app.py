@@ -358,12 +358,11 @@ def get_twu4_accessories(pump_model, accessories_dict):
             return accessories_dict[key]
     return None
 
+# Funkce pro HWJ
 def najdi_hwj(Q):
-    # Vrací první model, který splní požadavek na průtok (Q)
     for hwj in DATA_HWJ:
         if Q <= hwj["Q_max"]:
             return hwj
-    # Pokud není žádný, vrátí nejsilnější (poslední v seznamu)
     return DATA_HWJ[-1]
 
 # Výpočetní funkce
@@ -387,6 +386,23 @@ def find_best_pump(df, req_H, req_Q):
     df["abs_diff"] = (df["H_max"] - req_H).abs() + (df["Q_max"] - req_Q).abs()
     return df.nsmallest(1, "abs_diff")
 
+def doporuc_kabel(accessory, hloubka):
+    if accessory and "kabel" in accessory:
+        delky = sorted(accessory["kabel"].keys())
+        for d in delky:
+            if hloubka <= d:
+                return accessory["kabel"][d]
+        return accessory["kabel"][delky[-1]]
+    return (None, None)
+
+def get_twu4_accessories(pump_model, accessories_dict):
+    pump_model_norm = pump_model.replace(" ", "").replace("-", "").replace(".", "").upper()
+    for key in accessories_dict:
+        key_norm = key.replace(" ", "").replace("-", "").replace(".", "").upper()
+        if pump_model_norm in key_norm or key_norm in pump_model_norm:
+            return accessories_dict[key]
+    return None
+
 # --- UI a logika ---
 st.title("Konfigurátor pro výběr čerpadla Wilo 💧")
 st.markdown("Zadejte parametry zdroje a odběru. Doporučené čerpadlo a příslušenství budou vybrány automaticky.")
@@ -400,32 +416,7 @@ typ_zdroje = st.radio(
     )
 )
 
-if typ_zdroje == "Kopaná studna (>500 mm)":
-    df_long = pd.DataFrame(DATA_TWI5, columns=["H_max", "Q_max", "PumpModel"])
-elif typ_zdroje == "Vrt od 120 do 250 mm":
-    df_long = pd.DataFrame(DATA_TWU4, columns=["H_max", "Q_max", "PumpModel"])
-else:
-    df_long = pd.DataFrame(DATA_TWU3, columns=["H_max", "Q_max", "PumpModel"])
-df_long["Voltage"] = 230
-
-if st.button("Spočítat"):
-    H, loss = calculate_head(dist_vert, riser, press_bar, dist_horz)
-    Q = calculate_flow(persons, sprinklers, nozzles)
-    req_H = math.ceil(H)
-    req_Q = math.ceil(Q)
-    st.write(f"Výtlak H: {H:.2f} m (zaokrouhleno na {req_H} m), ztráta: {loss:.2f} m")
-    st.write(f"Průtok Q: {Q:.2f} m³/h (zaokrouhleno na {req_Q} m³/h)")
-    
-    # ---- NOVÁ PODMÍNKA PRO HWJ VODÁRNY ----
-    if typ_zdroje == "Kopaná studna (>500 mm)" and req_H <= 8:
-        hwj = najdi_hwj(req_Q)
-        st.subheader("Doporučená domácí vodárna (pro nízký výtlak):")
-        st.markdown(
-            f"**{hwj['model']}** | H_max: {hwj['H_max']} m | Q_max: {hwj['Q_max']} m³/h"
-        )
-        st.info("Pro nízký výtlak do 8 metrů je vhodné použít domácí vodárnu s integrovanou expanzní nádobou.")
-    else:
-
+# Parametry odběru vody
 st.header("Parametry odběru vody")
 col1, col2 = st.columns(2)
 with col1:
@@ -443,6 +434,16 @@ if typ_zdroje == "Vrt od 120 do 250 mm":
     st.subheader("Hloubka vrtu (pro výběr kabelu)")
     delka_kabelu = st.selectbox("Vyberte hloubku/délku kabelu (m):", [20, 30, 40, 50], index=1)
 
+# --- Příprava dat pro tabulku podle zdroje
+if typ_zdroje == "Kopaná studna (>500 mm)":
+    df_long = pd.DataFrame(DATA_TWI5, columns=["H_max", "Q_max", "PumpModel"])
+elif typ_zdroje == "Vrt od 120 do 250 mm":
+    df_long = pd.DataFrame(DATA_TWU4, columns=["H_max", "Q_max", "PumpModel"])
+else:
+    df_long = pd.DataFrame(DATA_TWU3, columns=["H_max", "Q_max", "PumpModel"])
+df_long["Voltage"] = 230
+
+# --- VÝPOČET A DOPORUČENÍ ---
 if st.button("Spočítat"):
     H, loss = calculate_head(dist_vert, riser, press_bar, dist_horz)
     Q = calculate_flow(persons, sprinklers, nozzles)
@@ -450,40 +451,50 @@ if st.button("Spočítat"):
     req_Q = math.ceil(Q)
     st.write(f"Výtlak H: {H:.2f} m (zaokrouhleno na {req_H} m), ztráta: {loss:.2f} m")
     st.write(f"Průtok Q: {Q:.2f} m³/h (zaokrouhleno na {req_Q} m³/h)")
-    result = find_best_pump(df_long, req_H, req_Q)
-    if not result.empty:
-        pump = result.iloc[0]
-        st.subheader("Doporučené čerpadlo:")
+    
+    # ---- NOVÁ PODMÍNKA PRO HWJ VODÁRNY ----
+    if typ_zdroje == "Kopaná studna (>500 mm)" and req_H <= 8:
+        hwj = najdi_hwj(req_Q)
+        st.subheader("Doporučená domácí vodárna (pro nízký výtlak):")
         st.markdown(
-            f"**{pump['PumpModel']}** | Napětí: {int(pump['Voltage'])} V | "
-            f"H_max: {int(pump['H_max'])} m | Q_max: {pump['Q_max']} m³/h"
+            f"**{hwj['model']}** | H_max: {hwj['H_max']} m | Q_max: {hwj['Q_max']} m³/h"
         )
-        # Příslušenství pro TWU4
-        if typ_zdroje == "Vrt od 120 do 250 mm":
-            acc = get_twu4_accessories(pump['PumpModel'], TWU4_ACCESSORIES)
-            if acc:
-                st.subheader("Doporučené příslušenství:")
-                st.write(f"- Řízení: **{acc['řízení']}**")
-                st.write(f"- Expanze: **{acc['expanze']}**" if acc['expanze'] else "- Expanze: (není potřeba)")
-                if delka_kabelu:
-                    kabel_typ, kabel_obj = doporuc_kabel(acc, delka_kabelu)
-                    if kabel_typ:
-                        st.write(f"- Kabel: **{kabel_typ}** (obj. {kabel_obj}) – doporučeno pro {delka_kabelu} m")
-                    else:
-                        st.warning("Pro zvolenou hloubku není kabel v seznamu.")
-                st.write(f"- Napojení: **{acc['napojení']}**")
-            else:
-                st.info("Pro tento model není příslušenství v seznamu.")
-
-
-        # *** Kde koupit ***
-        st.markdown(
-            """
-            <a href="https://wilo.com/cz/cs/dum-a-zahrada/%C5%98e%C5%A1en%C3%AD/" target="_blank">
-                <button style='font-size:1.2em; background:#21B6A8; color:white; padding:0.5em 2em; border:none; border-radius:6px; cursor:pointer; margin-top:1em;'>🌐 Kde koupit?</button>
-            </a>
-            """,
-            unsafe_allow_html=True
-        )
+        st.info("Pro nízký výtlak do 8 metrů je vhodné použít domácí vodárnu s integrovanou expanzní nádobou.")
+    else:
+        result = find_best_pump(df_long, req_H, req_Q)
+        if not result.empty:
+            pump = result.iloc[0]
+            st.subheader("Doporučené čerpadlo:")
+            st.markdown(
+                f"**{pump['PumpModel']}** | Napětí: {int(pump['Voltage'])} V | "
+                f"H_max: {int(pump['H_max'])} m | Q_max: {pump['Q_max']} m³/h"
+            )
+            # Příslušenství pro TWU4
+            if typ_zdroje == "Vrt od 120 do 250 mm":
+                acc = get_twu4_accessories(pump['PumpModel'], TWU4_ACCESSORIES)
+                if acc:
+                    st.subheader("Doporučené příslušenství:")
+                    st.write(f"- Řízení: **{acc['řízení']}**")
+                    st.write(f"- Expanze: **{acc['expanze']}**" if acc['expanze'] else "- Expanze: (není potřeba)")
+                    if delka_kabelu:
+                        kabel_typ, kabel_obj = doporuc_kabel(acc, delka_kabelu)
+                        if kabel_typ:
+                            st.write(f"- Kabel: **{kabel_typ}** (obj. {kabel_obj}) – doporučeno pro {delka_kabelu} m")
+                        else:
+                            st.warning("Pro zvolenou hloubku není kabel v seznamu.")
+                    st.write(f"- Napojení: **{acc['napojení']}**")
+                else:
+                    st.info("Pro tento model není příslušenství v seznamu.")
+            # Kde koupit tlačítko
+            st.markdown(
+                """
+                <a href="https://wilo.com/cz/cs/dum-a-zahrada/%C5%98e%C5%A1en%C3%AD/" target="_blank">
+                    <button style='font-size:1.2em; background:#21B6A8; color:white; padding:0.5em 2em; border:none; border-radius:6px; cursor:pointer; margin-top:1em;'>🌐 Kde koupit?</button>
+                </a>
+                """,
+                unsafe_allow_html=True
+            )
+        else:
+            st.warning("Žádné čerpadlo nesplňuje potřebné parametry.")
     else:
         st.warning("Žádné čerpadlo nesplňuje potřebné parametry.")
