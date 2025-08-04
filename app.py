@@ -420,6 +420,7 @@ with col1:
         0.0, 500.0, 5.0,
         help="Např. pokud je odběr v patře"
        ) 
+       
 with col2:
        persons = st.number_input(
         "Počet osob v domácnosti", 1, 20, 4,
