@@ -415,13 +415,13 @@ with col1:
         0.0, 20.0, 2.0,
         help="Tlak, který potřebujete v nejvyšším místě rozvodu"
     )
-with col2:
-    riser = st.number_input(
+     riser = st.number_input(
         "Výškový rozdíl mezi čerpadlem a nejvyšším odběrným místem [m]",
         0.0, 500.0, 5.0,
         help="Např. pokud je odběr v patře"
-    )
-    persons = st.number_input(
+       ) 
+with col2:
+       persons = st.number_input(
         "Počet osob v domácnosti", 1, 20, 4,
         help="Vliv na typický průtok"
     )
