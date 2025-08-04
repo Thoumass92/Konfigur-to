@@ -6,9 +6,9 @@ import math
 st.set_page_config(page_title="Výběr vhodného čerpadla Wilo", page_icon="💧")
 
 # --- Barvy ---
-WILO_GREEN = "#21B6A8"
-WILO_GOLD = "#169487"
-WILO_GREY = "#fff"
+BUTTON_COLOR = "#d4af37"         
+BUTTON_HOVER_COLOR = "#b5922a"    
+BUTTON_TEXT_COLOR = "#fff"  
 
 # --- Logo Wilo ---
 WILO_LOGO_URL = "https://scontent-fra3-1.xx.fbcdn.net/v/t39.30808-6/312307533_996663857947185_6220530952015731225_n.png?_nc_cat=108&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=83_eOJu59pQQ7kNvwF1FuJO&_nc_oc=AdneoM6Ax72YEQxMPuPNAht6eEjBBfllTwCT3yezrDZ-QGObbuWxfAnWIddVn6dLfSs&_nc_zt=23&_nc_ht=scontent-fra3-1.xx&_nc_gid=Yvtk47THe4NhpdkBwjbyjA&oh=00_AfTEkPpnVzUkus59W8aK0U_bAIazC2CjjpJAEQDqjSBFcg&oe=68916816"
