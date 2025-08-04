@@ -513,15 +513,12 @@ st.markdown(
 )
 
 # --- UI parametry ---
-colA, colB = st.columns([1, 2])
-with colA:
-    st.markdown(f"<div style='margin-top:0.8em;font-weight:500;color:#333;font-size:1.09em;'>{TXT['source_type']}</div>", unsafe_allow_html=True)
-with colB:
-    typ_zdroje = st.selectbox(
-        "",
-        (TXT["studna"], TXT["vrt120"], TXT["vrt100"]),
-        key="typ_zdroje_selectbox"
-    )
+typ_zdroje = st.radio(
+    TXT["source_type"],
+    options=[TXT["studna"], TXT["vrt120"], TXT["vrt100"]],
+    horizontal=True,
+    key="typ_zdroje_radio"
+)
 st.header(TXT["params_header"])
 col1, col2 = st.columns([1, 1])
 with col1:
