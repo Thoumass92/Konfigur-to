@@ -96,23 +96,31 @@ LANGS = {
     }
 }
 
-# --- Záhlaví a jazyk ---
+# --- Výběr jazyka nahoře vpravo ---
+col_lang, col_empty = st.columns([1, 8])
+with col_empty:
+    pass
+with col_lang:
+    lang = st.selectbox(
+        "", ["CZ", "EN"], format_func=lambda x: LANGS[x]["lang"], key="lang_selectbox"
+    )
+TXT = LANGS[lang]
+
+# --- Logo + Název na střed ---
 st.markdown(
     f"""
-    <div style='display:flex;align-items:center;justify-content:space-between;background-color:{WILO_GREEN};padding:1.2em 2em 0.5em 2em;border-radius:0 0 18px 18px;margin-bottom:2em;'>
-        <div style='display:flex;align-items:center;gap:24px;'>
-            <img src="{WILO_LOGO_URL}" style="height:48px;">
-            <span style='color:white; font-size:2.3em; font-weight:bold;'>{LANGS['CZ']['title']}</span>
+    <div style='display:flex;flex-direction:column;align-items:center;justify-content:center;margin-top:-2.2em;'>
+        <div style='background-color:{WILO_GREEN};padding:1.1em 2.5em 0.8em 2.5em;border-radius:0.8em;display:flex;align-items:center;gap:22px;'>
+            <img src="{WILO_LOGO_URL}" style="height:38px;margin-right:12px;">
+            <span style='color:white; font-size:2.2em; font-weight:700;'>{TXT['title']}</span>
         </div>
-        <div>
-    """, unsafe_allow_html=True
+        <div style='margin-top:1.25em;font-size:1.13em;color:#444;text-align:center;max-width:580px;'>
+            {TXT['desc']}
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True
 )
-lang = st.selectbox(
-    "", ["CZ", "EN"], format_func=lambda x: LANGS[x]["lang"], key="lang_selectbox"
-)
-st.markdown("</div></div>", unsafe_allow_html=True)
-
-TXT = LANGS[lang]
 
 # --- DATA BLOKY ---
 
