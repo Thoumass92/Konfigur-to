@@ -94,7 +94,7 @@ LANGS = {
         "cable": "Cable & rope",
         "connection": "Connection",
         "for_well": "for well",
-        "not_in_list": "No cable in list for this well depth."
+        "not_in_list": "No cable in list for this well depth.",
         "lang": "English",
         "title": "Pump Selection Tool",
         "desc": "Enter your source and demand parameters. The recommended pump and accessories will be selected automatically."
