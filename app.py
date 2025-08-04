@@ -118,10 +118,6 @@ st.markdown(f"""
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown(
-    f"<hr style='border: none; border-top: 2.5px solid {WILO_GREEN}; margin: 38px 0;'>",
-    unsafe_allow_html=True
-)
 
 # --- Jazykový přepínač vždy vpravo nahoře ---
 st.markdown("<div class='langbar'>", unsafe_allow_html=True)
