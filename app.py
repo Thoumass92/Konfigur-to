@@ -508,13 +508,15 @@ def doporuc_kabel(accessory, hloubka):
     return (None, (None, None))
 
 # --- UI parametry ---
-typ_zdroje = st.radio(
+typ_zdroje = st.selectbox(
     TXT["source_type"],
     (
         TXT["studna"],
         TXT["vrt120"],
         TXT["vrt100"]
-    )
+    ),
+    key="typ_zdroje_selectbox"
+)
 )
 st.header(TXT["params_header"])
 col1, col2 = st.columns([1, 1])
