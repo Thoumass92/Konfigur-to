@@ -517,7 +517,6 @@ typ_zdroje = st.selectbox(
     ),
     key="typ_zdroje_selectbox"
 )
-)
 st.header(TXT["params_header"])
 col1, col2 = st.columns([1, 1])
 with col1:
