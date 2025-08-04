@@ -2,65 +2,27 @@ import streamlit as st
 import pandas as pd
 import math
 
-# --- BARVY ---
-WILO_GREEN = "#21B6A8"
-WILO_GREEN_DARK = "#168e84"
-WILO_GREEN_LIGHT = "#8be6da"
-WILO_GREEN_HOVER = "#159d93"
-BUTTON_TEXT_COLOR = "#fff"
-BORDER_RADIUS = "8px"
+# --- Konfigurace stránky ---
+st.set_page_config(page_title="Výběr vhodného čerpadla Wilo", page_icon="💧")
 
+# --- Barvy ---
+WILO_GREEN = "#21B6A8"
+WILO_GOLD = "#d4af37"
+WILO_GREY = "#f5f5f5"
+
+# --- Logo Wilo ---
 WILO_LOGO_URL = "https://scontent-fra3-1.xx.fbcdn.net/v/t39.30808-6/312307533_996663857947185_6220530952015731225_n.png?_nc_cat=108&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=83_eOJu59pQQ7kNvwF1FuJO&_nc_oc=AdneoM6Ax72YEQxMPuPNAht6eEjBBfllTwCT3yezrDZ-QGObbuWxfAnWIddVn6dLfSs&_nc_zt=23&_nc_ht=scontent-fra3-1.xx&_nc_gid=Yvtk47THe4NhpdkBwjbyjA&oh=00_AfTEkPpnVzUkus59W8aK0U_bAIazC2CjjpJAEQDqjSBFcg&oe=68916816"
 
-# --- VLASTNÍ CSS ---
-st.markdown(f"""
-    <style>
-    .stButton button {{
-        background-color: {WILO_GREEN_DARK};
-        color: {BUTTON_TEXT_COLOR};
-        border-radius: {BORDER_RADIUS};
-        padding: 0.5em 2.2em;
-        font-size: 1.1em;
-        font-weight: bold;
-        border: none;
-        transition: background 0.3s;
-    }}
-    .stButton button:hover {{
-        background-color: {WILO_GREEN_HOVER};
-        color: white;
-    }}
-    .shop-btn {{
-        background-color: {WILO_GREEN_LIGHT};
-        color: #004643;
-        border: none;
-        border-radius: {BORDER_RADIUS};
-        padding: 0.45em 2em;
-        font-size: 1em;
-        font-weight: 600;
-        margin-bottom: 8px;
-        transition: background 0.3s;
-        text-decoration: none;
-        display: inline-block;
-    }}
-    .shop-btn:hover {{
-        background-color: {WILO_GREEN};
-        color: white;
-    }}
-    </style>
-""", unsafe_allow_html=True)
-
-def wilo_header():
-    st.markdown(
-        f"""
-        <div style='background-color:{WILO_GREEN};padding:1.2em 2em;display:flex;align-items:center;border-radius: 0 0 16px 16px;margin-bottom:2em;'>
-            <img src="{WILO_LOGO_URL}" style="height:48px;margin-right:24px;">
-            <span style='color:white; font-size:2.3em; font-weight:bold;'>Výběr vhodného čerpadla</span>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-wilo_header()
+# --- Nadpis se záhlavím ---
+st.markdown(
+    f"""
+    <div style='background-color:{WILO_GREEN};padding:1.5em 2em;display:flex;align-items:center;gap:24px;border-radius:0 0 18px 18px;margin-bottom:2em;'>
+        <img src="{WILO_LOGO_URL}" style="height:48px;">
+        <span style='color:white; font-size:2.3em; font-weight:bold;'>Výběr vhodného čerpadla</span>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 # --- DATA BLOKY ---
 
@@ -122,13 +84,6 @@ DATA_HWJ = [
     {"model": "HWJ 201 EM 20 l - M", "Q_max": 2.5, "H_max": 42},
     {"model": "HWJ 301 EM 60 l - M", "Q_max": 4.5, "H_max": 45},
     {"model": "HWJ 401 EM 60 l - M", "Q_max": 4.8, "H_max": 50},
-]
-
-# --- Seznam obchodů pro HWJ vodárny ---
-HWJ_SHOPS = [
-    {"name": "Bola.cz", "url": "https://www.bola.cz/vyhledat-produkt/HWJ"},
-    {"name": "Pumpa.eu", "url": "https://www.pumpa.eu/cs/wilo-jet-hwj-automaticke-samonasavaci-domaci-vodarny/"},
-    {"name": "Kamody.cz", "url": "https://www.kamody.cz/index.php?route=product/search&filter_name=HWJ"},
 ]
 
 # --- Kompletní příslušenství podle tabulky
@@ -389,23 +344,6 @@ TWU4_ACCESSORIES = {
     },
 }
 # --- Funkce ---
-def doporuc_kabel(accessory, hloubka):
-    if accessory and "kabel" in accessory:
-        delky = sorted(accessory["kabel"].keys())
-        for d in delky:
-            if hloubka <= d:
-                return d, accessory["kabel"][d]
-        return delky[-1], accessory["kabel"][delky[-1]]
-    return (None, (None, None))
-
-def get_twu4_accessories(pump_model, accessories_dict):
-    pump_model_norm = pump_model.replace(" ", "").replace("-", "").replace(".", "").upper()
-    for key in accessories_dict:
-        key_norm = key.replace(" ", "").replace("-", "").replace(".", "").upper()
-        if pump_model_norm in key_norm or key_norm in pump_model_norm:
-            return accessories_dict[key]
-    return None
-
 def najdi_hwj(Q):
     for hwj in DATA_HWJ:
         if Q <= hwj["Q_max"]:
@@ -432,7 +370,7 @@ def find_best_pump(df, req_H, req_Q):
     df["abs_diff"] = (df["H_max"] - req_H).abs() + (df["Q_max"] - req_Q).abs()
     return df.nsmallest(1, "abs_diff")
 
-# --- UI a logika ---
+# --- Parametry ---
 st.title("Konfigurátor pro výběr čerpadla Wilo 💧")
 st.markdown("Zadejte parametry zdroje a odběru. Doporučené čerpadlo a příslušenství budou vybrány automaticky.")
 
@@ -446,22 +384,22 @@ typ_zdroje = st.radio(
 )
 
 st.header("Parametry odběru vody")
-col1, col2 = st.columns([2, 1])
+col1, col2 = st.columns([1, 1])
 with col1:
     dist_vert = st.number_input(
         "Svislá vzdálenost (od hladiny ke středu čerpadla) [m]",
-        0.0, 1000.0, 5.0, step=1.0,
+        0.0, 1000.0, 4.0, step=1.0,
         help="Výška hladiny vody ode dna do čerpadla – pro povrchová čerpadla max. 8 m"
     )
     dist_horz = st.number_input(
         "Vzdálenost od čerpadla k prvnímu odběrnému místu [m]",
-        0.0, 1000.0, 15.0, step=1.0,
-        help="Délka vodovodního potrubí od čerpadla ke kohoutku"
+        0.0, 1000.0, 3.0, step=1.0,
+        help="Délka potrubí od čerpadla ke kohoutku"
     )
     press_bar = st.number_input(
         "Požadovaný tlak na výstupu [bar]",
-        0.0, 20.0, 2.0, step=0.1,
-        help="Tlak, který potřebujete v nejvyšším místě rozvodu"
+        0.0, 20.0, 2.0, step=0.5,
+        help="Tlak potřebný v nejvyšším místě rozvodu"
     )
 with col2:
     riser = st.number_input(
@@ -482,15 +420,16 @@ with col2:
         help="Počet míst, kde bude současně voda"
     )
 
-# --- Hloubka vrtu jako číslo ---
+# --- Hloubka vrtu ---
 hloubka_vrtu = None
 if typ_zdroje == "Vrt od 120 do 250 mm":
     hloubka_vrtu = st.number_input(
         "Hloubka vrtu (pro volbu kabelu a lanka) [m]",
-        min_value=10, max_value=200, value=30,
-        step=1, help="Celková hloubka vrtu od povrchu – kabel a lanko se doporučí podle této hodnoty."
+        min_value=10, max_value=200, value=30, step=1,
+        help="Celková hloubka vrtu od povrchu – kabel a lanko se doporučí podle této hodnoty."
     )
 
+# --- Výběr dat ---
 if typ_zdroje == "Kopaná studna (>500 mm)":
     df_long = pd.DataFrame(DATA_TWI5, columns=["H_max", "Q_max", "PumpModel"])
 elif typ_zdroje == "Vrt od 120 do 250 mm":
@@ -499,63 +438,60 @@ else:
     df_long = pd.DataFrame(DATA_TWU3, columns=["H_max", "Q_max", "PumpModel"])
 df_long["Voltage"] = 230
 
+# --- Výpočet ---
 if st.button("Spočítat"):
     H, loss = calculate_head(dist_vert, riser, press_bar, dist_horz)
     Q = calculate_flow(persons, sprinklers, nozzles)
     req_H = math.ceil(H)
     req_Q = math.ceil(Q)
-    st.write(f"Výtlak H: {H:.2f} m (zaokrouhleno na {req_H} m), ztráta: {loss:.2f} m")
-    st.write(f"Průtok Q: {Q:.2f} m³/h (zaokrouhleno na {req_Q} m³/h)")
+    st.markdown(
+        f"<div style='margin:1.3em 0 0.5em 0;color:#222;font-size:1.09em;'>"
+        f"<b>Výtlak H:</b> {H:.2f} m (zaokrouhleno na {req_H} m), <b>ztráta:</b> {loss:.2f} m<br>"
+        f"<b>Průtok Q:</b> {Q:.2f} m³/h (zaokrouhleno na {req_Q} m³/h)</div>",
+        unsafe_allow_html=True
+    )
 
-    # HWJ domácí vodárny pro kopanou studnu do 8 m
+    # --- HWJ doporučení ---
     if typ_zdroje == "Kopaná studna (>500 mm)" and dist_vert <= 8:
         hwj = najdi_hwj(req_Q)
-        st.subheader("Doporučená domácí vodárna (pro nízký výtlak):")
         st.markdown(
-            f"**{hwj['model']}** | H_max: {hwj['H_max']} m | Q_max: {hwj['Q_max']} m³/h"
+            "<div style='background:#fffde7;border-left:8px solid %s;padding:1.4em 2em 1.1em 2em;margin:2em 0 1.2em 0;border-radius:11px;'>"
+            "<span style='font-size:1.35em;font-weight:700;'>Doporučená domácí vodárna (pro nízký výtlak):</span><br><br>"
+            "<b style='font-size:1.18em;color:#222;'>%s</b> | <span style='color:#777;'>H_max:</span> %d m | <span style='color:#777;'>Q_max:</span> %.1f m³/h"
+            "<div style='margin-top:1em;background:#eaf5ff;border-radius:7px;padding:0.7em 1.2em;font-size:1em;'>"
+            "Pro sání do 8 metrů je vhodné použít domácí vodárnu s integrovanou expanzní nádobou."
+            "</div>"
+            "</div>" % (WILO_GOLD, hwj['model'], hwj['H_max'], hwj['Q_max']),
+            unsafe_allow_html=True
         )
-        st.info("Pro sání do 8 metrů je vhodné použít domácí vodárnu s integrovanou expanzní nádobou.")
-
-        # Výpis e-shopů
-        st.markdown("### Kde koupit domácí vodárnu HWJ:")
-        for shop in HWJ_SHOPS:
+        st.markdown("<h4 style='margin-top:0.7em'>Kde koupit domácí vodárnu HWJ:</h4>", unsafe_allow_html=True)
+        shops = [
+            {"name": "Bola.cz", "url": "https://www.bola.cz/vyhledat-produkt/HWJ"},
+            {"name": "Pumpa.eu", "url": "https://www.pumpa.eu/cs/wilo-jet-hwj-automaticke-samonasavaci-domaci-vodarny/"},
+            {"name": "Kamody.cz", "url": "https://www.kamody.cz/index.php?route=product/search&filter_name=HWJ"}
+        ]
+        for shop in shops:
             st.markdown(
-                f"""
-                <span style="font-weight:500;">{shop['name']}</span>
-                <a href="{shop['url']}" target="_blank" class="shop-btn">Koupit</a>
-                """,
-                unsafe_allow_html=True
-            )
+                f"<div style='display:flex;align-items:center;margin-bottom:0.5em;'>"
+                f"<span style='font-size:1.11em;font-weight:500;width:120px'>{shop['name']}</span>"
+                f"<a href='{shop['url']}' target='_blank'>"
+                f"<button style='margin-left:18px;padding:0.45em 1.6em;background:{WILO_GOLD};color:white;font-weight:bold;border:none;border-radius:6px;cursor:pointer;font-size:1.09em;'>Koupit</button>"
+                f"</a></div>", unsafe_allow_html=True)
     else:
         result = find_best_pump(df_long, req_H, req_Q)
         if not result.empty:
             pump = result.iloc[0]
-            st.subheader("Doporučené čerpadlo:")
             st.markdown(
-                f"**{pump['PumpModel']}** | Napětí: {int(pump['Voltage'])} V | "
-                f"H_max: {int(pump['H_max'])} m | Q_max: {pump['Q_max']} m³/h"
+                "<div style='background:#F8FCFB;border-left:8px solid %s;padding:1.2em 2em 1.2em 2em;margin:2em 0 1.3em 0;border-radius:11px;'>"
+                "<span style='font-size:1.3em;font-weight:700;'>Doporučené čerpadlo:</span><br><br>"
+                "<b style='font-size:1.12em;color:#222;'>%s</b> | <span style='color:#777;'>Napětí:</span> %d V | <span style='color:#777;'>H_max:</span> %d m | <span style='color:#777;'>Q_max:</span> %.1f m³/h"
+                "</div>" % (WILO_GREEN, pump['PumpModel'], int(pump['Voltage']), int(pump['H_max']), pump['Q_max']),
+                unsafe_allow_html=True
             )
-            # Příslušenství pro TWU4
-            if typ_zdroje == "Vrt od 120 do 250 mm":
-                acc = get_twu4_accessories(pump['PumpModel'], TWU4_ACCESSORIES)
-                if acc:
-                    st.subheader("Doporučené příslušenství:")
-                    st.write(f"- Řízení: **{acc['řízení']}**")
-                    st.write(f"- Expanze: **{acc['expanze']}**" if acc['expanze'] else "- Expanze: (není potřeba)")
-                    if hloubka_vrtu:
-                        dop_delka, (kabel_typ, kabel_obj) = doporuc_kabel(acc, hloubka_vrtu)
-                        if kabel_typ:
-                            st.write(f"- Kabel a lanko: **{kabel_typ}** (obj. {kabel_obj}) – doporučeno pro vrt {dop_delka} m (zadáno {hloubka_vrtu} m)")
-                        else:
-                            st.warning("Pro zadanou hloubku není kabel v seznamu.")
-                    st.write(f"- Napojení: **{acc['napojení']}**")
-                else:
-                    st.info("Pro tento model není příslušenství v seznamu.")
-
             st.markdown(
                 """
                 <a href="https://wilo.com/cz/cs/dum-a-zahrada/%C5%98e%C5%A1en%C3%AD/" target="_blank">
-                    <button style='font-size:1.2em; background:#21B6A8; color:white; padding:0.5em 2em; border:none; border-radius:6px; cursor:pointer; margin-top:1em;'>🌐 Kde koupit?</button>
+                    <button style='font-size:1.14em; background:#21B6A8; color:white; padding:0.55em 2.2em; border:none; border-radius:8px; cursor:pointer; margin-top:0.7em;'>🌐 Kde koupit?</button>
                 </a>
                 """,
                 unsafe_allow_html=True
