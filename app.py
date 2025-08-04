@@ -428,34 +428,36 @@ if st.button("Spočítat"):
     st.write(f"Výtlak H: {H:.2f} m (zaokrouhleno na {req_H} m), ztráta: {loss:.2f} m")
     st.write(f"Průtok Q: {Q:.2f} m³/h (zaokrouhleno na {req_Q} m³/h)")
 
-# HWJ vodárna do 8 m
-if typ_zdroje == "Kopaná studna (>500 mm)" and dist_vert <= 8:
-    hwj = najdi_hwj(req_Q)
-    st.subheader("Doporučená domácí vodárna (pro nízký výtlak):")
-    st.markdown(f"**{hwj['model']}** | H_max: {hwj['H_max']} m | Q_max: {hwj['Q_max']} m³/h")
-    st.info("Pro nízký výtlak do 8 metrů je vhodné použít domácí vodárnu s integrovanou expanzní nádobou.")
-
-    # Odkaz na výběr obchodu pomocí session_state
-    if "show_hwj_shops" not in st.session_state:
-        st.session_state["show_hwj_shops"] = False
-
-    if not st.session_state["show_hwj_shops"]:
-        if st.button("Kde koupit tuto domácí vodárnu?"):
-            st.session_state["show_hwj_shops"] = True
-        st.stop()
-    else:
-        obchod = st.selectbox(
-            "Vyberte obchod pro nákup HWJ vodárny:",
-            ("Bola.cz", "Pumpa.eu", "Kamody.cz")
+    # ---- NOVÁ PODMÍNKA PRO HWJ VODÁRNY ----
+    if typ_zdroje == "Kopaná studna (>500 mm)" and req_H <= 8:
+        hwj = najdi_hwj(req_Q)
+        st.subheader("Doporučená domácí vodárna (pro nízký výtlak):")
+        st.markdown(
+            f"**{hwj['model']}** | H_max: {hwj['H_max']} m | Q_max: {hwj['Q_max']} m³/h"
         )
-        if obchod == "Bola.cz":
-            st.markdown("[Přejít do obchodu Bola.cz](https://www.bola.cz/vyhledat-produkt/HWJ)", unsafe_allow_html=True)
-        elif obchod == "Pumpa.eu":
-            st.markdown("[Přejít do obchodu Pumpa.eu](https://www.pumpa.eu/cs/wilo-jet-hwj-automaticke-samonasavaci-domaci-vodarny/)", unsafe_allow_html=True)
-        elif obchod == "Kamody.cz":
-            st.markdown("[Přejít do obchodu Kamody.cz](https://www.kamody.cz/index.php?route=product/search&filter_name=HWJ)", unsafe_allow_html=True)
-    st.stop()
+        st.info("Pro nízký výtlak do 8 metrů je vhodné použít domácí vodárnu s integrovanou expanzní nádobou.")
 
+        # Odkaz na výběr obchodu pomocí session_state
+        if "show_hwj_shops" not in st.session_state:
+            st.session_state["show_hwj_shops"] = False
+
+        if not st.session_state["show_hwj_shops"]:
+            if st.button("Kde koupit tuto domácí vodárnu?"):
+                st.session_state["show_hwj_shops"] = True
+            st.stop()
+        else:
+            obchod = st.selectbox(
+                "Vyberte obchod pro nákup HWJ vodárny:",
+                ("Bola.cz", "Pumpa.eu", "Kamody.cz")
+            )
+            if obchod == "Bola.cz":
+                st.markdown("[Přejít do obchodu Bola.cz](https://www.bola.cz/vyhledat-produkt/HWJ)", unsafe_allow_html=True)
+            elif obchod == "Pumpa.eu":
+                st.markdown("[Přejít do obchodu Pumpa.eu](https://www.pumpa.eu/cs/wilo-jet-hwj-automaticke-samonasavaci-domaci-vodarny/)", unsafe_allow_html=True)
+            elif obchod == "Kamody.cz":
+                st.markdown("[Přejít do obchodu Kamody.cz](https://www.kamody.cz/index.php?route=product/search&filter_name=HWJ)", unsafe_allow_html=True)
+        st.stop()
+        
     # Výběr ponorného čerpadla (TWI/TWU)
     result = find_best_pump(df_long, req_H, req_Q)
     if not result.empty:
