@@ -96,7 +96,7 @@ LANGS = {
     }
 }
 
-# --- Výběr jazyka ---
+# --- Záhlaví a jazyk ---
 st.markdown(
     f"""
     <div style='display:flex;align-items:center;justify-content:space-between;background-color:{WILO_GREEN};padding:1.2em 2em 0.5em 2em;border-radius:0 0 18px 18px;margin-bottom:2em;'>
@@ -113,19 +113,6 @@ lang = st.selectbox(
 st.markdown("</div></div>", unsafe_allow_html=True)
 
 TXT = LANGS[lang]
-
-# --- Záhlaví ---
-st.markdown(
-    f"""
-    <div style='background-color:{WILO_GREEN};padding:1.5em 2em;display:flex;align-items:center;gap:24px;border-radius:0 0 18px 18px;margin-bottom:2em;'>
-        <img src="{WILO_LOGO_URL}" style="height:48px;">
-        <span style='color:white; font-size:2.3em; font-weight:bold;'>{TXT["title"]}</span>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-st.title(TXT["subtitle"])
-st.markdown(TXT["desc"])
 
 # --- DATA BLOKY ---
 
