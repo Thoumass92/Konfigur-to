@@ -52,7 +52,6 @@ LANGS = {
         "connection": "Napojení",
         "for_well": "pro vrt",
         "not_in_list": "Pro zadanou hloubku není kabel v seznamu."
-        "lang": "Čeština",
         "title": "Výběr vhodného čerpadla",
         "desc": "Zadejte parametry zdroje a odběru. Doporučené čerpadlo a příslušenství budou vybrány automaticky."
     },
