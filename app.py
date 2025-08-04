@@ -492,7 +492,7 @@ if typ_zdroje == "Kopaná studna (>500 mm)" and req_H <= 8:
                 """,
                 unsafe_allow_html=True
             )
-            )
+        
             # Příslušenství pro TWU4
             if typ_zdroje == "Vrt od 120 do 250 mm":
                 acc = get_twu4_accessories(pump['PumpModel'], TWU4_ACCESSORIES)
