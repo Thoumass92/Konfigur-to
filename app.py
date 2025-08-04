@@ -2,12 +2,9 @@ import streamlit as st
 import pandas as pd
 import math
 
-# --- Konfigurace stránky ---
-st.set_page_config(page_title="Výběr vhodného čerpadla Wilo", page_icon="💧")
-
 # --- Barvy ---
 WILO_GREEN = "#21B6A8"
-WILO_GOLD = "#d4af37"
+WILO_GREEN_LIGHT = "#d6f7f2"
 WILO_GREY = "#f5f5f5"
 
 # --- Logo Wilo ---
@@ -401,13 +398,12 @@ with col1:
         0.0, 20.0, 2.0, step=0.5,
         help="Tlak potřebný v nejvyšším místě rozvodu"
     )
+with col2:
     riser = st.number_input(
         "Výškový rozdíl mezi čerpadlem a nejvyšším odběrným místem [m]",
         0.0, 500.0, 2.0, step=1.0,
         help="Např. pokud je odběr v patře"
-     )
-     
-with col2:
+    )
     persons = st.number_input(
         "Počet osob v domácnosti", 1, 20, 4,
         help="Vliv na typický průtok"
@@ -456,13 +452,13 @@ if st.button("Spočítat"):
     if typ_zdroje == "Kopaná studna (>500 mm)" and dist_vert <= 8:
         hwj = najdi_hwj(req_Q)
         st.markdown(
-            "<div style='background:#fffde7;border-left:8px solid %s;padding:1.4em 2em 1.1em 2em;margin:2em 0 1.2em 0;border-radius:11px;'>"
-            "<span style='font-size:1.35em;font-weight:700;'>Doporučená domácí vodárna (pro nízký výtlak):</span><br><br>"
-            "<b style='font-size:1.18em;color:#222;'>%s</b> | <span style='color:#777;'>H_max:</span> %d m | <span style='color:#777;'>Q_max:</span> %.1f m³/h"
+            f"<div style='background:{WILO_GREEN_LIGHT};border-left:8px solid {WILO_GREEN};padding:1.4em 2em 1.1em 2em;margin:2em 0 1.2em 0;border-radius:11px;'>"
+            f"<span style='font-size:1.35em;font-weight:700;'>Doporučená domácí vodárna (pro nízký výtlak):</span><br><br>"
+            f"<b style='font-size:1.18em;color:#222;'>{hwj['model']}</b> | <span style='color:#777;'>H_max:</span> {hwj['H_max']} m | <span style='color:#777;'>Q_max:</span> {hwj['Q_max']:.1f} m³/h"
             "<div style='margin-top:1em;background:#eaf5ff;border-radius:7px;padding:0.7em 1.2em;font-size:1em;'>"
             "Pro sání do 8 metrů je vhodné použít domácí vodárnu s integrovanou expanzní nádobou."
             "</div>"
-            "</div>" % (WILO_GOLD, hwj['model'], hwj['H_max'], hwj['Q_max']),
+            "</div>",
             unsafe_allow_html=True
         )
         st.markdown("<h4 style='margin-top:0.7em'>Kde koupit domácí vodárnu HWJ:</h4>", unsafe_allow_html=True)
@@ -476,23 +472,23 @@ if st.button("Spočítat"):
                 f"<div style='display:flex;align-items:center;margin-bottom:0.5em;'>"
                 f"<span style='font-size:1.11em;font-weight:500;width:120px'>{shop['name']}</span>"
                 f"<a href='{shop['url']}' target='_blank'>"
-                f"<button style='margin-left:18px;padding:0.45em 1.6em;background:{WILO_GOLD};color:white;font-weight:bold;border:none;border-radius:6px;cursor:pointer;font-size:1.09em;'>Koupit</button>"
+                f"<button style='margin-left:18px;padding:0.45em 1.6em;background:{WILO_GREEN};color:white;font-weight:bold;border:none;border-radius:6px;cursor:pointer;font-size:1.09em;'>Koupit</button>"
                 f"</a></div>", unsafe_allow_html=True)
     else:
         result = find_best_pump(df_long, req_H, req_Q)
         if not result.empty:
             pump = result.iloc[0]
             st.markdown(
-                "<div style='background:#F8FCFB;border-left:8px solid %s;padding:1.2em 2em 1.2em 2em;margin:2em 0 1.3em 0;border-radius:11px;'>"
-                "<span style='font-size:1.3em;font-weight:700;'>Doporučené čerpadlo:</span><br><br>"
-                "<b style='font-size:1.12em;color:#222;'>%s</b> | <span style='color:#777;'>Napětí:</span> %d V | <span style='color:#777;'>H_max:</span> %d m | <span style='color:#777;'>Q_max:</span> %.1f m³/h"
-                "</div>" % (WILO_GREEN, pump['PumpModel'], int(pump['Voltage']), int(pump['H_max']), pump['Q_max']),
+                f"<div style='background:#F8FCFB;border-left:8px solid {WILO_GREEN};padding:1.2em 2em 1.2em 2em;margin:2em 0 1.3em 0;border-radius:11px;'>"
+                f"<span style='font-size:1.3em;font-weight:700;'>Doporučené čerpadlo:</span><br><br>"
+                f"<b style='font-size:1.12em;color:#222;'>{pump['PumpModel']}</b> | <span style='color:#777;'>Napětí:</span> {int(pump['Voltage'])} V | <span style='color:#777;'>H_max:</span> {int(pump['H_max'])} m | <span style='color:#777;'>Q_max:</span> {pump['Q_max']:.1f} m³/h"
+                "</div>",
                 unsafe_allow_html=True
             )
             st.markdown(
-                """
+                f"""
                 <a href="https://wilo.com/cz/cs/dum-a-zahrada/%C5%98e%C5%A1en%C3%AD/" target="_blank">
-                    <button style='font-size:1.14em; background:#21B6A8; color:white; padding:0.55em 2.2em; border:none; border-radius:8px; cursor:pointer; margin-top:0.7em;'>🌐 Kde koupit?</button>
+                    <button style='font-size:1.14em; background:{WILO_GREEN}; color:white; padding:0.55em 2.2em; border:none; border-radius:8px; cursor:pointer; margin-top:0.7em;'>🌐 Kde koupit?</button>
                 </a>
                 """,
                 unsafe_allow_html=True
