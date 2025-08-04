@@ -51,7 +51,7 @@ LANGS = {
         "cable": "Kabel a lanko",
         "connection": "Napojení",
         "for_well": "pro vrt",
-        "not_in_list": "Pro zadanou hloubku není kabel v seznamu."
+        "not_in_list": "Pro zadanou hloubku není kabel v seznamu.",
         "title": "Výběr vhodného čerpadla",
         "desc": "Zadejte parametry zdroje a odběru. Doporučené čerpadlo a příslušenství budou vybrány automaticky."
     },
