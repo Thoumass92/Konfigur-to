@@ -555,7 +555,10 @@ with col2:
     nozzles = st.number_input(
         TXT["nozzles"], 0, 20, 1
     )
-
+st.markdown(
+    f"<hr style='border: none; border-top: 2.5px solid {WILO_GREY}; margin: 38px 0;'>",
+    unsafe_allow_html=True
+)
 hloubka_vrtu = None
 if typ_zdroje == TXT["vrt120"]:
     hloubka_vrtu = st.number_input(
