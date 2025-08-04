@@ -44,7 +44,14 @@ LANGS = {
         "head_max": "H_max",
         "flow_max": "Q_max",
         "shop_btn": "🌐 Kde koupit?",
-        "no_pump": "Žádné čerpadlo nesplňuje potřebné parametry."
+        "no_pump": "Žádné čerpadlo nesplňuje potřebné parametry.",
+        "accessories": "Doporučené příslušenství:",
+        "control": "Řízení",
+        "expansion": "Expanze",
+        "cable": "Kabel a lanko",
+        "connection": "Napojení",
+        "for_well": "pro vrt",
+        "not_in_list": "Pro zadanou hloubku není kabel v seznamu."
     },
     "EN": {
         "lang": "English",
@@ -78,7 +85,14 @@ LANGS = {
         "head_max": "H_max",
         "flow_max": "Q_max",
         "shop_btn": "🌐 Where to buy?",
-        "no_pump": "No pump meets the required parameters."
+        "no_pump": "No pump meets the required parameters.",
+        "accessories": "Recommended accessories:",
+        "control": "Control",
+        "expansion": "Expansion",
+        "cable": "Cable & rope",
+        "connection": "Connection",
+        "for_well": "for well",
+        "not_in_list": "No cable in list for this well depth."
     }
 }
 
@@ -101,6 +115,7 @@ st.markdown(
 )
 st.title(TXT["subtitle"])
 st.markdown(TXT["desc"])
+
 # --- DATA BLOKY ---
 
 DATA_TWI5 = [
@@ -447,6 +462,23 @@ def find_best_pump(df, req_H, req_Q):
     df["abs_diff"] = (df["H_max"] - req_H).abs() + (df["Q_max"] - req_Q).abs()
     return df.nsmallest(1, "abs_diff")
 
+def get_twu4_accessories(pump_model, accessories_dict):
+    pump_model_norm = pump_model.replace(" ", "").replace("-", "").replace(".", "").upper()
+    for key in accessories_dict:
+        key_norm = key.replace(" ", "").replace("-", "").replace(".", "").upper()
+        if pump_model_norm in key_norm or key_norm in pump_model_norm:
+            return accessories_dict[key]
+    return None
+
+def doporuc_kabel(accessory, hloubka):
+    if accessory and "kabel" in accessory:
+        delky = sorted(accessory["kabel"].keys())
+        for d in delky:
+            if hloubka <= d:
+                return d, accessory["kabel"][d]
+        return delky[-1], accessory["kabel"][delky[-1]]
+    return (None, (None, None))
+
 # --- UI parametry ---
 typ_zdroje = st.radio(
     TXT["source_type"],
@@ -546,6 +578,21 @@ if st.button(TXT["spocitat"]):
                 "</div>",
                 unsafe_allow_html=True
             )
+            # --- Doplněk: příslušenství pro TWU4 ---
+            if typ_zdroje == TXT["vrt120"]:
+                acc = get_twu4_accessories(pump['PumpModel'], TWU4_ACCESSORIES)
+                if acc:
+                    st.markdown(f"<h4 style='margin-top:1.2em'>{TXT['accessories']}</h4>", unsafe_allow_html=True)
+                    st.markdown(f"- <b>{TXT['control']}:</b> {acc['řízení']}", unsafe_allow_html=True)
+                    st.markdown(f"- <b>{TXT['expansion']}:</b> {acc['expanze']}" if acc['expanze'] else f"- <b>{TXT['expansion']}:</b> (není potřeba)", unsafe_allow_html=True)
+                    # Automatická volba kabelu:
+                    if hloubka_vrtu:
+                        dop_delka, (kabel_typ, kabel_obj) = doporuc_kabel(acc, hloubka_vrtu)
+                        if kabel_typ:
+                            st.markdown(f"- <b>{TXT['cable']}:</b> {kabel_typ} (obj. {kabel_obj}) – {TXT['for_well']} {dop_delka} m (zadáno {hloubka_vrtu} m)", unsafe_allow_html=True)
+                        else:
+                            st.warning(TXT['not_in_list'])
+                    st.markdown(f"- <b>{TXT['connection']}:</b> {acc['napojení']}", unsafe_allow_html=True)
             st.markdown(
                 f"""
                 <a href="https://wilo.com/cz/cs/dum-a-zahrada/%C5%98e%C5%A1en%C3%AD/" target="_blank">
