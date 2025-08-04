@@ -584,10 +584,6 @@ if st.button(TXT["spocitat"]):
         f"<b>{TXT['flow']}:</b> {Q:.2f} m³/h (rounded {req_Q} m³/h)</div>",
         unsafe_allow_html=True
     )
-st.markdown(
-    f"<hr style='border: none; border-top: 2.5px solid {WILO_GREY}; margin: 38px 0;'>",
-    unsafe_allow_html=True
-)
     # --- HWJ doporučení ---
     if typ_zdroje == TXT["studna"] and dist_vert <= 8 and DATA_HWJ:
         hwj = najdi_hwj(req_Q)
