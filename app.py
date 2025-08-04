@@ -18,7 +18,7 @@ LANGS = {
         "title": "Výběr vhodného čerpadla",
         "subtitle": "Konfigurátor pro výběr čerpadla Wilo 💧",
         "desc": "Zadejte parametry zdroje a odběru. Doporučené čerpadlo a příslušenství budou vybrány automaticky.",
-        "source_type": "Typ zdroje vody:",
+        "source_type": "Vyberte zdroj vody:",
         "studna": "Kopaná studna (>500 mm)",
         "vrt120": "Vrt od 120 do 250 mm",
         "vrt100": "Vrt do 120 mm",
@@ -61,7 +61,7 @@ LANGS = {
         "title": "Pump Selection Tool",
         "subtitle": "Wilo Pump Selection Configurator 💧",
         "desc": "Enter your source and usage parameters. Recommended pump and accessories will be selected automatically.",
-        "source_type": "Source type:",
+        "source_type": "Select water source:",
         "studna": "Dug well (>500 mm)",
         "vrt120": "Borehole 120–250 mm",
         "vrt100": "Borehole up to 120 mm",
@@ -513,8 +513,13 @@ st.markdown(
 )
 
 # --- UI parametry ---
+st.markdown(
+    f"<span style='font-size:1.19em;font-weight:700;color:#222;'>{TXT['pick_source']}</span>",
+    unsafe_allow_html=True
+)
+
 typ_zdroje = st.radio(
-    TXT["source_type"],
+    "",
     options=[TXT["studna"], TXT["vrt120"], TXT["vrt100"]],
     horizontal=True,
     key="typ_zdroje_radio"
