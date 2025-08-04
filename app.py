@@ -52,6 +52,9 @@ LANGS = {
         "connection": "Napojení",
         "for_well": "pro vrt",
         "not_in_list": "Pro zadanou hloubku není kabel v seznamu."
+        "lang": "Čeština",
+        "title": "Výběr vhodného čerpadla",
+        "desc": "Zadejte parametry zdroje a odběru. Doporučené čerpadlo a příslušenství budou vybrány automaticky."
     },
     "EN": {
         "lang": "English",
@@ -93,34 +96,32 @@ LANGS = {
         "connection": "Connection",
         "for_well": "for well",
         "not_in_list": "No cable in list for this well depth."
+        "lang": "English",
+        "title": "Pump Selection Tool",
+        "desc": "Enter your source and demand parameters. The recommended pump and accessories will be selected automatically."
     }
 }
 
-# --- Vzhled jazykového přepínače ---
-lang_select_css = """
-    <style>
-    .stSelectbox>div>div>div>div {
-        font-size: 1.17em !important;
-        font-weight: 600 !important;
-        min-width: 110px !important;
-    }
-    .stSelectbox, .stSelectbox>div { 
-        margin-bottom: -1.4em !important;
-    }
-    </style>
-"""
-st.markdown(lang_select_css, unsafe_allow_html=True)
+# --- CSS pro větší selectbox ---
+st.markdown("""
+<style>
+div[data-baseweb="select"] > div {
+    font-size: 1.16em !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
-# --- Jazyk úplně nahoru, zarovnaný vpravo ---
-lang = st.selectbox(
-    "",
-    ["CZ", "EN"],
-    format_func=lambda x: LANGS[x]["lang"],
-    key="lang_selectbox"
-)
+# --- Jazykový přepínač úplně nahoře vpravo ---
+colA, colB = st.columns([7,1])
+with colB:
+    lang = st.selectbox(
+        "", ["CZ", "EN"],
+        format_func=lambda x: LANGS[x]["lang"],
+        key="lang_selectbox"
+    )
 TXT = LANGS[lang]
 
-# --- Panel s logem, titulek na střed, vyšší zelený panel ---
+# --- Panel s logem a titulkem ---
 st.markdown(
     f"""
     <div style='width:100%; display:flex; flex-direction:column; align-items:center; margin-top:-1.5em;'>
