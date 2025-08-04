@@ -76,6 +76,12 @@ DATA_TWU3 = [
     [15, 1.0, "TWU 3-0603"], [15, 1.5, "TWU 3-0605"], [15, 2.0, "TWU 3-0607"],
 ]
 
+DATA_HWJ = [
+    {"model": "HWJ 201 EM 20 l - M", "Q_max": 2.5, "H_max": 42},
+    {"model": "HWJ 301 EM 60 l - M", "Q_max": 4.5, "H_max": 45},
+    {"model": "HWJ 401 EM 60 l - M", "Q_max": 4.8, "H_max": 50},
+]
+
 # --- Kompletní příslušenství podle tabulky
 # Pro přehlednosti uvádím jen základní část, ale můžeš ji libovolně rozšířit. Stačí přidat další položky podle potřeby.
 TWU4_ACCESSORIES = {
@@ -351,6 +357,14 @@ def get_twu4_accessories(pump_model, accessories_dict):
         if pump_model_norm in key_norm or key_norm in pump_model_norm:
             return accessories_dict[key]
     return None
+
+def najdi_hwj(Q):
+    # Vrací první model, který splní požadavek na průtok (Q)
+    for hwj in DATA_HWJ:
+        if Q <= hwj["Q_max"]:
+            return hwj
+    # Pokud není žádný, vrátí nejsilnější (poslední v seznamu)
+    return DATA_HWJ[-1]
 
 # Výpočetní funkce
 def calculate_head(dist_vert, riser, press_bar, dist_horz, friction_coeff=0.05):
