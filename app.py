@@ -1,4 +1,4 @@
-import streamlit as st
+mport streamlit as st
 import pandas as pd
 import math
 
@@ -9,11 +9,6 @@ WILO_GREY = "#f5f5f5"
 
 # --- Logo ---
 WILO_LOGO_URL = "https://scontent-fra3-1.xx.fbcdn.net/v/t39.30808-6/312307533_996663857947185_6220530952015731225_n.png?_nc_cat=108&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=83_eOJu59pQQ7kNvwF1FuJO&_nc_oc=AdneoM6Ax72YEQxMPuPNAht6eEjBBfllTwCT3yezrDZ-QGObbuWxfAnWIddVn6dLfSs&_nc_zt=23&_nc_ht=scontent-fra3-1.xx&_nc_gid=Yvtk47THe4NhpdkBwjbyjA&oh=00_AfTEkPpnVzUkus59W8aK0U_bAIazC2CjjpJAEQDqjSBFcg&oe=68916816"
-
-LANGS = {
-    "CZ": {"lang": "Čeština", "title": "Výběr vhodného čerpadla", "desc": "Zadejte parametry zdroje a odběru. Doporučené čerpadlo a příslušenství budou vybrány automaticky."},
-    "EN": {"lang": "English", "title": "Pump Selection Tool", "desc": "Enter your source and demand parameters. The recommended pump and accessories will be selected automatically."}
-}
 
 # --- Překladové slovníky ---
 LANGS = {
@@ -106,55 +101,45 @@ LANGS = {
     }
 }
 
-# --- Větší selectbox pomocí CSS ---
+# --- Větší selectbox a úpravy vzhledu ---
 st.markdown("""
-<style>
-div[data-baseweb="select"] {
-    width: 180px !important;
-    font-size: 1.15em !important;
-}
-span[data-baseweb="select"] {
-    font-size: 1.13em !important;
-}
-</style>
-""", unsafe_allow_html=True)
+    <style>
+    .lang-selectbox label {display:none;}
+    div[data-baseweb="select"] { width:200px !important; font-size:1.13em !important;}
+    .header-main {width:100vw; min-width:1000px; margin-left:calc(-50vw + 50%); background:%s; 
+      padding:2.3em 0 2em 0; border-radius:0 0 32px 32px; box-shadow:0 8px 36px #21b6a81b;}
+    .header-content {display:flex; align-items:center; justify-content:center; gap:28px;}
+    .header-title {color:white; font-size:2.7em; font-weight:900; letter-spacing:-1px;}
+    .header-desc {margin-top:1em; font-size:1.2em; color:#444; text-align:center;}
+    .langbar {width:100%%; display:flex; justify-content:flex-end; margin-bottom:-3.2em; margin-top:1.2em;}
+    </style>
+""" % WILO_GREEN, unsafe_allow_html=True)
 
-# --- Přepínač jazyka úplně nahoře, pěkně vpravo ---
-colA, colB, colC = st.columns([7, 2, 7])
-with colB:
-    lang = st.selectbox(
-        " ",
-        options=["CZ", "EN"],
-        format_func=lambda x: LANGS[x]["lang"],
-        key="lang_selectbox"
-    )
+# --- Jazykový přepínač vždy vpravo nahoře ---
+st.markdown("<div class='langbar'>", unsafe_allow_html=True)
+lang = st.selectbox(
+    "",
+    options=["CZ", "EN"],
+    format_func=lambda x: LANGS[x]["lang"],
+    key="lang_selectbox",
+    label_visibility="collapsed"
+)
+st.markdown("</div>", unsafe_allow_html=True)
 TXT = LANGS[lang]
 
-# --- Titulek a popis ---
+# --- Hlavička a popis ---
 st.markdown(
     f"""
-    <div style='width:100%; display:flex; flex-direction:column; align-items:center; margin-top:-1.5em;'>
-        <div style='
-            background-color:{WILO_GREEN};
-            padding:2.1em 2em 1.8em 2em;
-            border-radius:16px;
-            margin-bottom:1em;
-            min-width:450px;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            gap:32px;
-            box-shadow:0 4px 20px #21b6a82c;'
-        >
-            <img src="{WILO_LOGO_URL}" style="height:54px; margin-right:16px;">
-            <span style='color:white; font-size:2.5em; font-weight:900; letter-spacing:-1px;'>{TXT['title']}</span>
-        </div>
-        <div style='margin-top:-0.5em;font-size:1.21em;color:#444;text-align:center;max-width:680px;'>
-            {TXT['desc']}
-        </div>
+    <div class='header-main'>
+      <div class='header-content'>
+        <img src="{WILO_LOGO_URL}" style="height:56px; margin-right:18px;">
+        <span class='header-title'>{TXT['title']}</span>
+      </div>
     </div>
-    """,
-    unsafe_allow_html=True
+    <div class='header-desc'>
+      {TXT['desc']}
+    </div>
+    """, unsafe_allow_html=True
 )
 # --- DATA BLOKY ---
 
