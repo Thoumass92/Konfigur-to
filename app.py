@@ -7,19 +7,100 @@ WILO_GREEN = "#21B6A8"
 WILO_GREEN_LIGHT = "#d6f7f2"
 WILO_GREY = "#f5f5f5"
 
-# --- Logo Wilo ---
+# --- Logo ---
 WILO_LOGO_URL = "https://scontent-fra3-1.xx.fbcdn.net/v/t39.30808-6/312307533_996663857947185_6220530952015731225_n.png?_nc_cat=108&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=83_eOJu59pQQ7kNvwF1FuJO&_nc_oc=AdneoM6Ax72YEQxMPuPNAht6eEjBBfllTwCT3yezrDZ-QGObbuWxfAnWIddVn6dLfSs&_nc_zt=23&_nc_ht=scontent-fra3-1.xx&_nc_gid=Yvtk47THe4NhpdkBwjbyjA&oh=00_AfTEkPpnVzUkus59W8aK0U_bAIazC2CjjpJAEQDqjSBFcg&oe=68916816"
 
-# --- Nadpis se záhlavím ---
+# --- Překladové slovníky ---
+LANGS = {
+    "CZ": {
+        "lang": "Čeština",
+        "switch": "Jazyk",
+        "title": "Výběr vhodného čerpadla",
+        "subtitle": "Konfigurátor pro výběr čerpadla Wilo 💧",
+        "desc": "Zadejte parametry zdroje a odběru. Doporučené čerpadlo a příslušenství budou vybrány automaticky.",
+        "source_type": "Typ zdroje vody:",
+        "studna": "Kopaná studna (>500 mm)",
+        "vrt120": "Vrt od 120 do 250 mm",
+        "vrt100": "Vrt do 120 mm",
+        "params_header": "Parametry odběru vody",
+        "depth": "Svislá vzdálenost (od hladiny ke středu čerpadla) [m]",
+        "pipe": "Vzdálenost od čerpadla k prvnímu odběrnému místu [m]",
+        "press": "Požadovaný tlak na výstupu [bar]",
+        "riser": "Výškový rozdíl mezi čerpadlem a nejvyšším odběrným místem [m]",
+        "persons": "Počet osob v domácnosti",
+        "sprinklers": "Počet zavlažovacích zařízení",
+        "nozzles": "Počet výstupů pro hadici",
+        "vrt_depth": "Hloubka vrtu (pro volbu kabelu a lanka) [m]",
+        "spocitat": "Spočítat",
+        "head": "Výtlak H",
+        "loss": "ztráta",
+        "flow": "Průtok Q",
+        "hwj_title": "Doporučená domácí vodárna (pro nízký výtlak):",
+        "hwj_suitable": "Pro sání do 8 metrů je vhodné použít domácí vodárnu s integrovanou expanzní nádobou.",
+        "where_hwk": "Kde koupit domácí vodárnu HWJ:",
+        "buy": "Koupit",
+        "pump_title": "Doporučené čerpadlo:",
+        "voltage": "Napětí",
+        "head_max": "H_max",
+        "flow_max": "Q_max",
+        "shop_btn": "🌐 Kde koupit?",
+        "no_pump": "Žádné čerpadlo nesplňuje potřebné parametry."
+    },
+    "EN": {
+        "lang": "English",
+        "switch": "Language",
+        "title": "Pump Selection Tool",
+        "subtitle": "Wilo Pump Selection Configurator 💧",
+        "desc": "Enter your source and usage parameters. Recommended pump and accessories will be selected automatically.",
+        "source_type": "Source type:",
+        "studna": "Dug well (>500 mm)",
+        "vrt120": "Borehole 120–250 mm",
+        "vrt100": "Borehole up to 120 mm",
+        "params_header": "Water draw parameters",
+        "depth": "Vertical distance (from water level to pump center) [m]",
+        "pipe": "Distance from pump to first draw-off point [m]",
+        "press": "Required outlet pressure [bar]",
+        "riser": "Elevation difference between pump and highest draw-off point [m]",
+        "persons": "Number of persons in household",
+        "sprinklers": "Number of sprinklers",
+        "nozzles": "Number of hose outlets",
+        "vrt_depth": "Well depth (for cable and rope selection) [m]",
+        "spocitat": "Calculate",
+        "head": "Total Head H",
+        "loss": "loss",
+        "flow": "Flow Q",
+        "hwj_title": "Recommended domestic waterworks (for low lift):",
+        "hwj_suitable": "For suction up to 8 meters, a domestic waterworks with integrated expansion vessel is suitable.",
+        "where_hwk": "Where to buy HWJ domestic waterworks:",
+        "buy": "Buy",
+        "pump_title": "Recommended pump:",
+        "voltage": "Voltage",
+        "head_max": "H_max",
+        "flow_max": "Q_max",
+        "shop_btn": "🌐 Where to buy?",
+        "no_pump": "No pump meets the required parameters."
+    }
+}
+
+# --- Výběr jazyka ---
+lang = st.radio(
+    f"🌐 {LANGS['CZ']['switch']}/{LANGS['EN']['switch']}", ["CZ", "EN"],
+    format_func=lambda x: LANGS[x]["lang"]
+)
+TXT = LANGS[lang]
+
+# --- Záhlaví ---
 st.markdown(
     f"""
     <div style='background-color:{WILO_GREEN};padding:1.5em 2em;display:flex;align-items:center;gap:24px;border-radius:0 0 18px 18px;margin-bottom:2em;'>
         <img src="{WILO_LOGO_URL}" style="height:48px;">
-        <span style='color:white; font-size:2.3em; font-weight:bold;'>Výběr vhodného čerpadla</span>
+        <span style='color:white; font-size:2.3em; font-weight:bold;'>{TXT["title"]}</span>
     </div>
     """,
     unsafe_allow_html=True
 )
+st.title(TXT["subtitle"])
+st.markdown(TXT["desc"])
 
 # --- DATA BLOKY ---
 
