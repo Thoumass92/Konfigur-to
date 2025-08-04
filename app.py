@@ -503,8 +503,9 @@ with col1:
         TXT["press"],
         0.0, 20.0, 2.0, step=0.5
     )
- riser = st.number_input(
-        TXT["riser"], 0.0, 500.0, 2.0, step=1.0
+    riser = st.number_input(
+        TXT["riser"],
+        0.0, 500.0, 2.0, step=1.0
     )
     
 with col2:
