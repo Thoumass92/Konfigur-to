@@ -102,18 +102,21 @@ LANGS = {
 }
 
 # --- Větší selectbox a úpravy vzhledu ---
-st.markdown("""
+st.markdown(f"""
     <style>
-    .lang-selectbox label {display:none;}
-    div[data-baseweb="select"] { width:200px !important; font-size:1.13em !important;}
-    .header-main {width:100vw; min-width:1000px; margin-left:calc(-50vw + 50%); background:%s; 
-      padding:2.3em 0 2em 0; border-radius:0 0 32px 32px; box-shadow:0 8px 36px #21b6a81b;}
-    .header-content {display:flex; align-items:center; justify-content:center; gap:28px;}
-    .header-title {color:white; font-size:2.7em; font-weight:900; letter-spacing:-1px;}
-    .header-desc {margin-top:1em; font-size:1.2em; color:#444; text-align:center;}
-    .langbar {width:100%%; display:flex; justify-content:flex-end; margin-bottom:-3.2em; margin-top:1.2em;}
+    .lang-selectbox label {{display:none;}}
+    div[data-baseweb="select"] {{ width:200px !important; font-size:1.13em !important;}}
+    .header-main {{
+        width:100vw; min-width:1000px; margin-left:calc(-50vw + 50%);
+        background:{WILO_GREEN}; 
+        padding:2.3em 0 2em 0; border-radius:0 0 32px 32px; box-shadow:0 8px 36px #21b6a81b;
+    }}
+    .header-content {{display:flex; align-items:center; justify-content:center; gap:28px;}}
+    .header-title {{color:white; font-size:2.7em; font-weight:900; letter-spacing:-1px;}}
+    .header-desc {{margin-top:1em; font-size:1.2em; color:#444; text-align:center;}}
+    .langbar {{width:100%%; display:flex; justify-content:flex-end; margin-bottom:-3.2em; margin-top:1.2em;}}
     </style>
-""" % WILO_GREEN, unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
 # --- Jazykový přepínač vždy vpravo nahoře ---
 st.markdown("<div class='langbar'>", unsafe_allow_html=True)
