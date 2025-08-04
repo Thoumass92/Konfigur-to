@@ -97,10 +97,21 @@ LANGS = {
 }
 
 # --- Výběr jazyka ---
-lang = st.radio(
-    f"🌐 {LANGS['CZ']['switch']}/{LANGS['EN']['switch']}", ["CZ", "EN"],
-    format_func=lambda x: LANGS[x]["lang"]
+st.markdown(
+    f"""
+    <div style='display:flex;align-items:center;justify-content:space-between;background-color:{WILO_GREEN};padding:1.2em 2em 0.5em 2em;border-radius:0 0 18px 18px;margin-bottom:2em;'>
+        <div style='display:flex;align-items:center;gap:24px;'>
+            <img src="{WILO_LOGO_URL}" style="height:48px;">
+            <span style='color:white; font-size:2.3em; font-weight:bold;'>{LANGS['CZ']['title']}</span>
+        </div>
+        <div>
+    """, unsafe_allow_html=True
 )
+lang = st.selectbox(
+    "", ["CZ", "EN"], format_func=lambda x: LANGS[x]["lang"], key="lang_selectbox"
+)
+st.markdown("</div></div>", unsafe_allow_html=True)
+
 TXT = LANGS[lang]
 
 # --- Záhlaví ---
