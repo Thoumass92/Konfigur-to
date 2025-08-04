@@ -402,39 +402,37 @@ col1, col2 = st.columns(2)
 with col1:
     dist_vert = st.number_input(
         "Svislá vzdálenost (od hladiny ke středu čerpadla) [m]",
-        0.0, 1000.0, 10.0,
+        0.0, 1000.0, 10.0, step=1.0,
         help="Výška hladiny vody ode dna do čerpadla – pro povrchová čerpadla max. 8 m"
+    )
+    riser = st.number_input(
+        "Výškový rozdíl mezi čerpadlem a nejvyšším odběrným místem [m]",
+        0.0, 500.0, 5.0, step=1.0,
+        help="Např. pokud je odběr v patře"
     )
     dist_horz = st.number_input(
         "Vzdálenost od čerpadla k prvnímu odběrnému místu [m]",
-        0.0, 1000.0, 20.0,
+        0.0, 1000.0, 20.0, step=1.0,
         help="Délka vodovodního potrubí od čerpadla ke kohoutku"
     )
     press_bar = st.number_input(
         "Požadovaný tlak na výstupu [bar]",
-        0.0, 20.0, 2.0,
+        0.0, 20.0, 2.0, step=0.1,
         help="Tlak, který potřebujete v nejvyšším místě rozvodu"
     )
-     riser = st.number_input(
-        "Výškový rozdíl mezi čerpadlem a nejvyšším odběrným místem [m]",
-        0.0, 500.0, 5.0,
-        help="Např. pokud je odběr v patře"
-       ) 
-       
 with col2:
-       persons = st.number_input(
-        "Počet osob v domácnosti", 1, 20, 4,
+    persons = st.number_input(
+        "Počet osob v domácnosti", 1, 20, 4, step=1,
         help="Vliv na typický průtok"
     )
     sprinklers = st.number_input(
-        "Počet zavlažovacích zařízení", 0, 10, 1,
+        "Počet zavlažovacích zařízení", 0, 10, 1, step=1,
         help="Počet závlahových postřikovačů"
     )
     nozzles = st.number_input(
-        "Počet výstupů pro hadici", 0, 20, 1,
+        "Počet výstupů pro hadici", 0, 20, 1, step=1,
         help="Počet míst, kde bude současně voda"
     )
-
 # --- Hloubka vrtu jako číslo ---
 hloubka_vrtu = None
 if typ_zdroje == "Vrt od 120 do 250 mm":
