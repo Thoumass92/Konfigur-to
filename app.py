@@ -511,6 +511,7 @@ st.markdown(
     f"<hr style='border: none; border-top: 2.5px solid {WILO_GREY}; margin: 38px 0;'>",
     unsafe_allow_html=True
 )
+
 # --- UI parametry ---
 typ_zdroje = st.selectbox(
     TXT["source_type"],
