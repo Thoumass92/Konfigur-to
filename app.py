@@ -496,5 +496,3 @@ if st.button("Spočítat"):
             )
         else:
             st.warning("Žádné čerpadlo nesplňuje potřebné parametry.")
-    else:
-        st.warning("Žádné čerpadlo nesplňuje potřebné parametry.")
