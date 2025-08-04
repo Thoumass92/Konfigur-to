@@ -408,6 +408,24 @@ else:
     df_long = pd.DataFrame(DATA_TWU3, columns=["H_max", "Q_max", "PumpModel"])
 df_long["Voltage"] = 230
 
+if st.button("Spočítat"):
+    H, loss = calculate_head(dist_vert, riser, press_bar, dist_horz)
+    Q = calculate_flow(persons, sprinklers, nozzles)
+    req_H = math.ceil(H)
+    req_Q = math.ceil(Q)
+    st.write(f"Výtlak H: {H:.2f} m (zaokrouhleno na {req_H} m), ztráta: {loss:.2f} m")
+    st.write(f"Průtok Q: {Q:.2f} m³/h (zaokrouhleno na {req_Q} m³/h)")
+    
+    # ---- NOVÁ PODMÍNKA PRO HWJ VODÁRNY ----
+    if typ_zdroje == "Kopaná studna (>500 mm)" and req_H <= 8:
+        hwj = najdi_hwj(req_Q)
+        st.subheader("Doporučená domácí vodárna (pro nízký výtlak):")
+        st.markdown(
+            f"**{hwj['model']}** | H_max: {hwj['H_max']} m | Q_max: {hwj['Q_max']} m³/h"
+        )
+        st.info("Pro nízký výtlak do 8 metrů je vhodné použít domácí vodárnu s integrovanou expanzní nádobou.")
+    else:
+
 st.header("Parametry odběru vody")
 col1, col2 = st.columns(2)
 with col1:
