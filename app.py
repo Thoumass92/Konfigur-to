@@ -584,7 +584,10 @@ if st.button(TXT["spocitat"]):
         f"<b>{TXT['flow']}:</b> {Q:.2f} m³/h (rounded {req_Q} m³/h)</div>",
         unsafe_allow_html=True
     )
-
+st.markdown(
+    f"<hr style='border: none; border-top: 2.5px solid {WILO_GREY}; margin: 38px 0;'>",
+    unsafe_allow_html=True
+)
     # --- HWJ doporučení ---
     if typ_zdroje == TXT["studna"] and dist_vert <= 8 and DATA_HWJ:
         hwj = najdi_hwj(req_Q)
@@ -609,6 +612,10 @@ if st.button(TXT["spocitat"]):
                 f"<a href='{shop['url']}' target='_blank'>"
                 f"<button style='margin-left:18px;padding:0.45em 1.6em;background:{WILO_GREEN};color:white;font-weight:bold;border:none;border-radius:6px;cursor:pointer;font-size:1.09em;'>{TXT['buy']}</button>"
                 f"</a></div>", unsafe_allow_html=True)
+    st.markdown(
+    f"<hr style='border: none; border-top: 2.5px solid {WILO_GREY}; margin: 38px 0;'>",
+    unsafe_allow_html=True
+)
     else:
         result = find_best_pump(df_long, req_H, req_Q)
         if not result.empty:
